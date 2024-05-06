@@ -1,3 +1,5 @@
+@const-end
+
 ; ID 20
 (def stats-battery-soc 0)
 (def stats-duty 0)
@@ -27,6 +29,8 @@
 (def stats-temp-motor-max 0)
 (def stats-amps-now-min 0)
 (def stats-fault-codes-observed (list))
+
+@const-start
 
 (defun stats-reset-max () {
     (def stats-reset-now true)

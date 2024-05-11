@@ -74,19 +74,31 @@
 
     (if (not-eq stats-angle-pitch (ix view-previous-stats 5)) {
         (img-clear buf-incline)
-        (var hill-grade (* (tan (abs stats-angle-pitch)) 100))
-        (txt-block-l buf-incline 1 0 13 font18 (str-merge (str-from-n (to-i hill-grade) "%d") "%"))
+        (var hill-grade (* (tan stats-angle-pitch) 100))
+        (if (> hill-grade 500) (setq hill-grade 500))
+        (if (< hill-grade -500) (setq hill-grade -500))
 
         (var font-w (bufget-u8 font18 1))
         (var buf-height (second (img-dims buf-incline)))
-        (var angle-displayed (* (abs stats-angle-pitch) 57.2958))
+        (var angle-displayed (* stats-angle-pitch 57.2958))
         (if (> angle-displayed 45.0) (setq angle-displayed 45.0))
-        (img-line buf-incline (* font-w 2) ; x1
-            (- buf-height 1) ;y1 at bottom
+        (if (< angle-displayed -45.0) (setq angle-displayed -45.0))
+        (var half-height (/ buf-height 2.0))
+
+        (img-line buf-incline 0 ; x1
+            (+ half-height (* half-height (/ angle-displayed 45.0 ))) ;y1
             (first (img-dims buf-incline)) ;x2 at right end
-            (- (- buf-height 1) (* (- buf-height 1) (/ angle-displayed 45.0 ))) ;y2 is max buf-height
+            (- half-height (* half-height (/ angle-displayed 45.0 ))) ;y2
             1
         )
+
+        ; Draw text centered over line
+        (var out-str (str-merge (str-from-n (to-i hill-grade) "%d") "%"))
+        (var txt-w (+ (* (bufget-u8 font18 0) (str-len out-str)) 6))
+        (var font-h (bufget-u8 font18 1))
+        (var half-width (/ (first (img-dims buf-incline)) 2))
+        (img-rectangle buf-incline (- half-width (/ txt-w 2)) (- half-height (/ font-h 2)) txt-w font-h 0 '(filled))
+        (txt-block-c buf-incline 1 (/ (first (img-dims buf-incline)) 2) 13 font18 out-str)
     })
 })
 

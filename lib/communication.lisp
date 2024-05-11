@@ -32,7 +32,7 @@
         (def stats-temp-esc (/ (bufget-i16 data 2) 10.0))
         (def stats-temp-motor (/ (bufget-i16 data 4) 10.0))
         ;(def stats-angle-pitch (/ (bufget-i16 data 6) 10.0))
-(setq stats-angle-pitch (if (> (+ stats-angle-pitch 0.0174533) 1.5708) 0.0 (+ stats-angle-pitch 0.0174533))) ; TODO: this is... illegal!!
+(setq stats-angle-pitch (if (> (+ stats-angle-pitch 0.0174533) 1.5708) -1.5708 (+ stats-angle-pitch 0.0174533))) ; TODO: this is... illegal!!
         (setq rx-cnt-can (+ rx-cnt-can 1))
     })
     (if (= id 22) {

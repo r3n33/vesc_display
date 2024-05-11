@@ -1,3 +1,11 @@
+(def state-view 'view-dash-primary)
+(def state-view-next 'view-dash-primary)
+(def state-view-previous state-view)
+
+(def fps 0.0)
+
+@const-start
+
 (gpio-configure 5 'pin-mode-out)
 
 (defun display-init () {
@@ -10,10 +18,6 @@
 })
 
 (def views (list 'view-dash-primary 'view-speed-large 'view-statistics 'view-minigame))
-
-(def state-view 'view-dash-primary)
-(def state-view-next 'view-dash-primary)
-(def state-view-previous state-view)
 
 (defun init-current-view () {
     (match state-view
@@ -70,7 +74,6 @@
     )
 })
 
-(def fps 0.0)
 (defun display-thread () {
     (var frame-ms 0.0)
     (var last-frame-time (systime))

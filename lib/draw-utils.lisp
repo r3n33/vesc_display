@@ -1,3 +1,5 @@
+@const-start
+
 (defun ease-in-out-quint (x)
     (if (< x 0.5)
         (* 16 x x x x x)

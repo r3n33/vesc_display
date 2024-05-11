@@ -1,3 +1,5 @@
+@const-start
+
 (defun view-init-speed-large  () {
     (def buf-units (img-buffer 'indexed2 50 25))
     (def buf-top-speed (img-buffer 'indexed2 50 25))

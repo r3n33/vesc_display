@@ -1,3 +1,5 @@
+@const-start
+
 (defun view-init-statistics () {
     (var radius 95)
     (var x-offs 10)
@@ -42,15 +44,24 @@
         (img-clear buf-trip)
         (img-clear buf-range)
 
-        (var whkm 0)
+        (def whkm 0)
         (if (> stats-km 0.0) (setq whkm (/ (- stats-wh stats-wh-chg) stats-km)))
-        (txt-block-l buf-efficiency 1 0 0 font18 (list "Wh/km" (str-from-n (to-i whkm) "%d")))
+        (txt-block-l buf-efficiency 1 0 0 font18 (list "Wh/km" (if (> whkm 10.0)
+            (str-from-n (to-i whkm) "%d")
+            (str-from-n whkm "%0.1f")
+        )))
 
         (txt-block-l buf-trip 1 0 0 font18 (list "Trip" (str-from-n stats-km (if (> stats-km 99.9) "%0.0fkm" "%0.1fkm"))))
 
-        (var range-left 65) ; TODO
-
-        (txt-block-l buf-range 1 0 0 font18 (list "Range" (str-from-n range-left "%dkm")))
+        ; Calculate range
+        (var ah-remaining (* stats-battery-ah stats-battery-soc))
+        (var wh-remaining (* ah-remaining stats-vin))
+        (var range-remaining 0)
+        (if (> whkm 0) (setq range-remaining (/ wh-remaining whkm))) 
+        (txt-block-l buf-range 1 0 0 font18 (list "Range" (if (> range-remaining 10.0)
+            (str-from-n (to-i range-remaining) "%dkm")
+            (str-from-n range-remaining "%0.1fkm")
+        )))
     })
     
 })
@@ -66,13 +77,13 @@
         ; Max Amps Regen0
         (img-clear buf-gauge)
         (draw-gauge-quadrant buf-gauge radius radius radius 1 2 17 0 (if (and (< stats-amps-now 0) (> stats-amps-max 0)) (/ (to-float (abs stats-amps-now)) stats-amps-max) 0) true true nil 4)
-        (txt-block-r buf-gauge 3 radius 52 font18 (list (if (< stats-amps-now 0) (str-from-n stats-amps-now "%dA") "-0A") (str-from-n stats-amps-now-min "%dA")))
+        (txt-block-r buf-gauge 3 radius 52 font18 (list (if (< stats-amps-now 0) (str-from-n stats-amps-now "%dA") "0A") (str-from-n stats-amps-now-min "%dA")))
         (disp-render buf-gauge x-offs y-offs '(0x000000 0x0000ff 0x1b1b1b 0xfbfcfc 0x4f4f4f))
 
         ; Max Amps
         (img-clear buf-gauge)
         (draw-gauge-quadrant buf-gauge 0 radius radius 1 2 17 1 (if (and (> stats-amps-now 0) (> stats-amps-max 0)) (/ (to-float stats-amps-now) stats-amps-max) 0.0) nil true (if (> stats-amps-max 0) (/ (to-float stats-amps-avg) stats-amps-max) 0) 4)
-        (txt-block-l buf-gauge 3 4 52 font18 (list (if (> stats-amps-now 0) (str-from-n stats-amps-now "%dA") "0A") (str-from-n stats-amps-max "%dA")))
+        (txt-block-l buf-gauge 3 4 52 font18 (list (if (> stats-amps-now 0) (str-from-n stats-amps-now "%dA") "0A") (str-from-n stats-amps-now-max "%dA")))
         (disp-render buf-gauge (+ padding (+ x-offs radius)) y-offs '(0x000000 0x00d8ff 0x1b1b1b 0xfbfcfc 0x4f4f4f))
     })
     (if (or 
@@ -81,13 +92,13 @@
         ) {
         ; Watt Hours Consumed
         (img-clear buf-gauge)
-        (draw-gauge-quadrant buf-gauge 0 0 radius 1 2 17 2 (if (not-eq stats-wh 0) (/ (to-float stats-wh) (+ stats-wh stats-wh-chg)) 0) true nil nil nil)
+        (draw-gauge-quadrant buf-gauge 0 0 radius 1 2 17 2 (if (not-eq stats-wh 0) (/ stats-wh (+ stats-wh stats-wh-chg)) 0) true nil nil nil)
         (txt-block-l buf-gauge 3 4 4 font18 (list (str-from-n stats-wh "%dWh") "out"))
         (disp-render buf-gauge (+ padding (+ x-offs radius)) (+ padding (+ y-offs radius)) '(0x000000 0xfbd00a 0x1b1b1b 0xfbfcfc))
 
         ; Watt Hours Regenerated
         (img-clear buf-gauge)
-        (draw-gauge-quadrant buf-gauge radius 0 radius 1 2 17 3 (if (not-eq stats-wh 0) (/ (to-float stats-wh-chg) (+ stats-wh stats-wh-chg)) 0) nil nil nil nil)
+        (draw-gauge-quadrant buf-gauge radius 0 radius 1 2 17 3 (if (not-eq stats-wh 0) (/ stats-wh-chg (+ stats-wh stats-wh-chg)) 0) nil nil nil nil)
         (txt-block-r buf-gauge 3 radius 4 font18 (list (str-from-n stats-wh-chg "%dWh") "in"))
         (disp-render buf-gauge x-offs (+ padding (+ y-offs radius)) '(0x000000 0x97bf0d 0x1b1b1b 0xfbfcfc))
     })

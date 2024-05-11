@@ -1,4 +1,3 @@
-@const-end
 
 ; ID 20
 (def stats-battery-soc 0)
@@ -19,6 +18,9 @@
 (def stats-amps-avg 0)
 (def stats-amps-max 0)
 (def stats-amps-now 0)
+(def stats-battery-ah 0)
+; ID24
+(def stats-vin 0)
 
 ; Computed Statistics (resettable)
 (def stats-reset-now nil)
@@ -27,6 +29,7 @@
 (def stats-temp-battery-max 0)
 (def stats-temp-esc-max 0)
 (def stats-temp-motor-max 0)
+(def stats-amps-now-max 0)
 (def stats-amps-now-min 0)
 (def stats-fault-codes-observed (list))
 
@@ -51,7 +54,11 @@
         (if stats-reset-now {
             (def stats-kmh-max 0)
             (def stats-kw-max 0)
-    
+            (def stats-temp-battery-max 0)
+            (def stats-temp-esc-max 0)
+            (def stats-temp-motor-max 0)
+            (def stats-amps-now-max 0)
+            (def stats-amps-now-min 0)
             (def stats-reset-now nil)
         })
     
@@ -62,9 +69,12 @@
         (if (> stats-kw stats-kw-max) (def stats-kw-max stats-kw))
 
         ; Max Temps
-        (if (> stats-temp-battery stats-temp-battery-max) (def stats-temp-battery-max stats-temp-battery))
-        (if (> stats-temp-esc stats-temp-esc-max) (def stats-temp-esc-max stats-temp-esc))
+        (if (> stats-temp-battery stats-temp-battery-max) (setq stats-temp-battery-max stats-temp-battery))
+        (if (> stats-temp-esc stats-temp-esc-max) (setq stats-temp-esc-max stats-temp-esc))
         (if (> stats-temp-motor stats-temp-motor-max) (def stats-temp-motor-max stats-temp-motor))
+
+        ; Max Amps Observed
+        (if (< stats-amps-now-max stats-amps-now) (def stats-amps-now-max stats-amps-now))
 
         ; Min Amps Observed (Max Regen Amps)
         (if (> stats-amps-now-min stats-amps-now) (def stats-amps-now-min stats-amps-now))

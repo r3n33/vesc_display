@@ -1,3 +1,7 @@
+(def rx-cnt-can 0)
+
+@const-start
+
 (defun proc-data (src des data rssi) {
     ; Ignore broadcast, only handle data sent directly to us
     (if (not-eq des broadcast-addr) {
@@ -13,7 +17,6 @@
 })
 
 
-(def rx-cnt-can 0)
 (defun proc-sid (id data) {
     (if (= id 20) {
         (def stats-battery-soc (/ (bufget-i16 data 0) 1000.0))
@@ -28,13 +31,13 @@
         (def stats-temp-battery (/ (bufget-i16 data 0) 10.0))
         (def stats-temp-esc (/ (bufget-i16 data 2) 10.0))
         (def stats-temp-motor (/ (bufget-i16 data 4) 10.0))
-        (def stats-angle-pitch (/ (bufget-i16 data 6) 10.0))
-(def stats-angle-pitch (* (mod (rand) 45) 0.0174533)) ; TODO: this is... illegal!!
+        ;(def stats-angle-pitch (/ (bufget-i16 data 6) 10.0))
+(setq stats-angle-pitch (if (> (+ stats-angle-pitch 0.0174533) 1.5708) 0.0 (+ stats-angle-pitch 0.0174533))) ; TODO: this is... illegal!!
         (setq rx-cnt-can (+ rx-cnt-can 1))
     })
     (if (= id 22) {
-        (def stats-wh (bufget-u16 data 0))
-        (def stats-wh-chg (bufget-u16 data 2))
+        (def stats-wh (/ (bufget-u16 data 0) 10.0))
+        (def stats-wh-chg (/ (bufget-u16 data 2) 10.0))
         (def stats-km (/ (bufget-u16 data 4) 10.0))
         (def stats-fault-code (bufget-u16 data 6))
         (setq rx-cnt-can (+ rx-cnt-can 1))
@@ -43,6 +46,11 @@
         (def stats-amps-avg (bufget-u16 data 0))
         (def stats-amps-max (bufget-u16 data 2))
         (def stats-amps-now (bufget-i16 data 4))
+        (def stats-battery-ah (bufget-u16 data 6))
+        (setq rx-cnt-can (+ rx-cnt-can 1))
+    })
+    (if (= id 24) {
+        (def stats-vin (/ (bufget-u16 data 0) 10.0))
         (setq rx-cnt-can (+ rx-cnt-can 1))
     })
 

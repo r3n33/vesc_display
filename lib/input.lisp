@@ -1,3 +1,10 @@
+(def btn-0-pressed nil)
+(def btn-1-pressed nil)
+(def btn-2-pressed nil)
+(def btn-3-pressed nil)
+
+@const-start
+
 ; Evaluate expression if the function isn't nil.
 ; Ex: ```
 ; (defun fun-a (a) (print a))
@@ -11,11 +18,6 @@
         ,expr
     )
 }))
-
-(def btn-0-pressed nil)
-(def btn-1-pressed nil)
-(def btn-2-pressed nil)
-(def btn-3-pressed nil)
 
 (defun input-cleanup-on-pressed () {
     (def on-btn-0-pressed nil)

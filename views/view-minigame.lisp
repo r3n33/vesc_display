@@ -1,3 +1,5 @@
+@const-start
+
 (defun view-init-minigame () {
     (def buf-game-over (img-buffer 'indexed2 196 60))
     (def game-score 0)

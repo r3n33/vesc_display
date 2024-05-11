@@ -1,3 +1,5 @@
+@const-start
+
 (defun view-init-name () {
     
 })

@@ -1,3 +1,5 @@
+@const-start
+
 (defun view-init-dash-primary  () {
     (def buf-stripe-bg (img-buffer-from-bin icon-stripe))
     (def buf-motor-icon (img-buffer-from-bin icon-motor))

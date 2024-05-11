@@ -92,13 +92,13 @@
         ) {
         ; Watt Hours Consumed
         (img-clear buf-gauge)
-        (draw-gauge-quadrant buf-gauge 0 0 radius 1 2 17 2 (if (not-eq stats-wh 0) (/ stats-wh (+ stats-wh stats-wh-chg)) 0) true nil nil nil)
+        (draw-gauge-quadrant buf-gauge 0 0 radius 1 2 17 2 (if (> stats-wh 0) (/ stats-wh (+ stats-wh stats-wh-chg)) 0) true nil nil nil)
         (txt-block-l buf-gauge 3 4 4 font18 (list (str-from-n stats-wh "%dWh") "out"))
         (disp-render buf-gauge (+ padding (+ x-offs radius)) (+ padding (+ y-offs radius)) '(0x000000 0xfbd00a 0x1b1b1b 0xfbfcfc))
 
         ; Watt Hours Regenerated
         (img-clear buf-gauge)
-        (draw-gauge-quadrant buf-gauge radius 0 radius 1 2 17 3 (if (not-eq stats-wh 0) (/ stats-wh-chg (+ stats-wh stats-wh-chg)) 0) nil nil nil nil)
+        (draw-gauge-quadrant buf-gauge radius 0 radius 1 2 17 3 (if (> stats-wh-chg 0) (/ stats-wh-chg (+ stats-wh stats-wh-chg)) 0) nil nil nil nil)
         (txt-block-r buf-gauge 3 radius 4 font18 (list (str-from-n stats-wh-chg "%dWh") "in"))
         (disp-render buf-gauge x-offs (+ padding (+ y-offs radius)) '(0x000000 0x97bf0d 0x1b1b1b 0xfbfcfc))
     })

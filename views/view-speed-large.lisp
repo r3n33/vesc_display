@@ -1,10 +1,10 @@
 @const-start
 
 (defun view-init-speed-large  () {
-    (def buf-units (img-buffer 'indexed2 50 25))
-    (def buf-top-speed (img-buffer 'indexed2 50 25))
+    (def buf-units (img-buffer 'indexed4 50 25))
+    (def buf-top-speed (img-buffer 'indexed4 50 25))
     (def buf-arcs (img-buffer 'indexed4 320 58))
-    (def buf-speed-large (img-buffer 'indexed2 240 128))
+    (def buf-speed-large (img-buffer 'indexed4 240 128))
 
     (view-init-menu)
     (defun on-btn-0-pressed () {
@@ -40,7 +40,7 @@
         (if (> value-speed-pct 1.0) (setq value-speed-pct 1.0))
 
         (img-clear buf-units)
-        (draw-units buf-units 0 0 1 font15)
+        (draw-units buf-units 0 0 (list 0 1 2 3) font15)
 
         (draw-double-arcs buf-arcs value-speed-pct)
 
@@ -50,7 +50,7 @@
             (mph (* stats-kmh 0.621371))
             (_ (print "Unexpected settings-units value"))
         ))
-        (txt-block-c buf-speed-large 1 120 0 font128 (str-from-n speed-now "%0.0f"))
+        (txt-block-c buf-speed-large (list 0 1 2 3) 120 0 font128 (str-from-n speed-now "%0.0f"))
 
         (img-clear buf-top-speed)
         (var speed-max-now (match (car settings-units) 
@@ -58,18 +58,20 @@
             (mph (* stats-kmh-max 0.621371))
             (_ (print "Unexpected settings-units value"))
         ))
-        (draw-top-speed buf-top-speed 50 0 1 speed-max-now font18)
+        (draw-top-speed buf-top-speed 50 0 (list 0 1 2 3) speed-max-now font18)
     })
 })
 
 (defun view-render-speed-large () {
     (if view-changed {
         (def view-changed false)
-        ;(print "rendering spd large")
-        (disp-render buf-units 0 0 '(0x000000 0xf4f7f9))
-        (disp-render buf-top-speed (- 320 50) 0 '(0x000000 0xf4f7f9))
+        (var colors-smalltext-aa '(0x000000 0x4f514f 0x929491 0xf4f7f9))
+        (var colors-text-aa '(0x000000 0x4f514f 0x929491 0xfbfcfc))
+
+        (disp-render buf-units 0 0 colors-smalltext-aa)
+        (disp-render buf-top-speed (- 320 50) 0 colors-smalltext-aa)
         (disp-render buf-arcs 0 20 '(0x000000 0x1e9af3 0x65d7f5 0x444444))
-        (disp-render buf-speed-large 40 78 '(0x000000 0xfbfcfc))
+        (disp-render buf-speed-large 40 78 colors-text-aa)
     })
     
 })

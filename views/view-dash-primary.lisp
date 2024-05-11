@@ -7,15 +7,16 @@
     (def buf-battery-icon (img-buffer-from-bin icon-battery))
     (def buf-warning-icon (img-buffer-from-bin icon-warning))
 
-    (def buf-motor-val (img-buffer 'indexed2 (first (img-dims buf-motor-icon)) 20))
-    (def buf-esc-val (img-buffer 'indexed2 (first (img-dims buf-esc-icon)) 20))
-    (def buf-battery-val (img-buffer 'indexed2 (first (img-dims buf-battery-icon)) 20))
+    (def buf-motor-val (img-buffer 'indexed4 (first (img-dims buf-motor-icon)) 20))
+    (def buf-esc-val (img-buffer 'indexed4 (first (img-dims buf-esc-icon)) 20))
+    (def buf-battery-val (img-buffer 'indexed4 (first (img-dims buf-battery-icon)) 20))
 
-    (def buf-incline (img-buffer 'indexed2 120 35))
-    (def buf-battery (img-buffer 'indexed4 42 140))
+    (def buf-incline (img-buffer 'indexed4 120 35))
+    (def buf-battery (img-buffer 'indexed4 42 120))
+    (def buf-battery-soc (img-buffer 'indexed4 50 20))
     
-    (def buf-speed (img-buffer 'indexed2 179 90))
-    (def buf-units (img-buffer 'indexed2 50 25))
+    (def buf-speed (img-buffer 'indexed4 179 90))
+    (def buf-units (img-buffer 'indexed4 50 15))
 
     (view-init-menu)
     (defun on-btn-2-pressed () {
@@ -32,16 +33,17 @@
     (view-render-menu)
     (disp-render buf-stripe-bg 5 68 '(0x000000 0x1e9af3 0x22c7ff 0x22c7ff))
     (def buf-stripe-bg nil)
-    (disp-render buf-motor-icon 8 10 '(0x000000 0x4f514f 0x929491 0xfbfcfc))
-    (disp-render buf-esc-icon 64 10 '(0x000000 0x4f514f 0x929491 0xfbfcfc))
-    (disp-render buf-battery-icon 126 10 '(0x000000 0x4f514f 0x929491 0xfbfcfc))
+    (var colors-text-aa '(0x000000 0x4f514f 0x929491 0xfbfcfc))
+    (disp-render buf-motor-icon 8 10 colors-text-aa)
+    (disp-render buf-esc-icon 64 10 colors-text-aa)
+    (disp-render buf-battery-icon 126 10 colors-text-aa)
 })
 
 (defun view-draw-dash-primary () {
     (if (not-eq stats-kmh (first view-previous-stats)) {
         ; Update Speed
         (img-clear buf-units)
-        (draw-units buf-units 0 0 1 font15)
+        (draw-units buf-units 0 0 (list 0 1 2 3) font15)
 
         (img-clear buf-speed)
         (var speed-now (match (car settings-units) 
@@ -49,27 +51,30 @@
             (mph (* stats-kmh 0.621371))
             (_ (print "Unexpected settings-units value"))
         ))
-        (txt-block-c buf-speed 1 87 0 font88 (str-from-n speed-now "%0.0f"))
+        (txt-block-c buf-speed (list 0 1 2 3) 87 0 font88 (str-from-n speed-now "%0.0f"))
     })
     (if (not-eq (to-i (* 100 stats-battery-soc)) (second view-previous-stats)) {
         ; Update Battery %
         (img-clear buf-battery)
         (var displayed-soc (* 100 stats-battery-soc))
         (if (< displayed-soc 0) (setq displayed-soc 0))
-        (draw-battery-soc buf-battery 38 140 font15 (to-i displayed-soc))
+        (draw-battery-soc buf-battery 38 (second (img-dims buf-battery)) stats-battery-soc)
+
+        (img-clear buf-battery-soc)
+        (txt-block-c buf-battery-soc (list 0 1 2 3) (/ (first (img-dims buf-battery-soc)) 2) 0 font15 (str-merge (str-from-n displayed-soc "%0.0f") "%"))
     })
 
     (if (not-eq stats-temp-battery (ix view-previous-stats 2)) {
         (img-clear buf-battery-val)
-        (txt-block-c buf-battery-val 1 (/ (first (img-dims buf-battery-icon)) 2) 0 font18 (str-from-n (to-i stats-temp-battery) "%dC"))
+        (txt-block-c buf-battery-val (list 0 1 2 3) (/ (first (img-dims buf-battery-icon)) 2) 0 font18 (str-from-n (to-i stats-temp-battery) "%dC"))
     })
     (if (not-eq stats-temp-esc (ix view-previous-stats 3)) {
         (img-clear buf-esc-val)
-        (txt-block-c buf-esc-val 1 (/ (first (img-dims buf-esc-icon)) 2) 0 font18 (str-from-n (to-i stats-temp-esc) "%dC"))
+        (txt-block-c buf-esc-val (list 0 1 2 3) (/ (first (img-dims buf-esc-icon)) 2) 0 font18 (str-from-n (to-i stats-temp-esc) "%dC"))
     })
     (if (not-eq stats-temp-motor (ix view-previous-stats 4)) {
         (img-clear buf-motor-val)
-        (txt-block-c buf-motor-val 1 (/ (first (img-dims buf-motor-icon)) 2) 0 font18 (str-from-n (to-i stats-temp-motor) "%dC"))
+        (txt-block-c buf-motor-val (list 0 1 2 3) (/ (first (img-dims buf-motor-icon)) 2) 0 font18 (str-from-n (to-i stats-temp-motor) "%dC"))
     })
 
     (if (not-eq stats-angle-pitch (ix view-previous-stats 5)) {
@@ -98,14 +103,15 @@
         (var font-h (bufget-u8 font18 1))
         (var half-width (/ (first (img-dims buf-incline)) 2))
         (img-rectangle buf-incline (- half-width (/ txt-w 2)) (- half-height (/ font-h 2)) txt-w font-h 0 '(filled))
-        (txt-block-c buf-incline 1 (/ (first (img-dims buf-incline)) 2) 13 font18 out-str)
+        (txt-block-c buf-incline (list 0 1 2 3) (/ (first (img-dims buf-incline)) 2) 13 font18 out-str)
     })
 })
 
 (defun view-render-dash-primary () {
+    (var colors-text-aa '(0x000000 0x4f514f 0x929491 0xfbfcfc))
     (if (not-eq stats-kmh (first view-previous-stats)) {
-        (disp-render buf-speed 0 105 '(0x000000 0xfbfcfc))
-        (disp-render buf-units 175 187 '(0x000000 0xf4f7f9))
+        (disp-render buf-speed 0 105 colors-text-aa)
+        (disp-render buf-units 175 197 colors-text-aa)
     })
     
     (if (not-eq (to-i (* 100 stats-battery-soc)) (second view-previous-stats)) {
@@ -114,21 +120,22 @@
             (setq color (lerp-color 0xe72a62 0xffa500 (ease-in-out-quint (* stats-battery-soc 2))))
             (setq color (lerp-color 0xffa500 0x7f9a0d (ease-in-out-quint (* (- stats-battery-soc 0.5) 2))))
         )
-        (disp-render buf-battery 265 75 `(0x000000 0xfbfcfc ,color 0x0000ff))
+        (disp-render buf-battery 265 95 `(0x000000 0xfbfcfc ,color 0x0000ff))
+        (disp-render buf-battery-soc 261 75 colors-text-aa)
     })
 
     (if (not-eq stats-temp-motor (ix view-previous-stats 4)) {
-        (disp-render buf-motor-val 8 44 '(0x000000 0xfbfcfc))
+        (disp-render buf-motor-val 8 44 colors-text-aa)
     })
     (if (not-eq stats-temp-battery (ix view-previous-stats 2)) {
-        (disp-render buf-battery-val 126 44 '(0x000000 0xfbfcfc))
+        (disp-render buf-battery-val 126 44 colors-text-aa)
     })
     (if (not-eq stats-temp-esc (ix view-previous-stats 3)) {
-        (disp-render buf-esc-val 64 44 '(0x000000 0xfbfcfc))
+        (disp-render buf-esc-val 64 44 colors-text-aa)
     })
 
     (if (not-eq stats-angle-pitch (ix view-previous-stats 5)) {
-        (disp-render buf-incline 188 4 '(0x000000 0xfbfcfc))
+        (disp-render buf-incline 188 4 colors-text-aa)
     })
 
     (def view-previous-stats (list stats-kmh (to-i (* 100 stats-battery-soc)) stats-temp-battery stats-temp-esc stats-temp-motor stats-angle-pitch))
@@ -148,6 +155,7 @@
     (def buf-esc-val nil)
     (def buf-battery-val nil)
     (def buf-battery nil)
+    (def buf-battery-val nil)
     (def buf-speed nil)
     (def buf-units nil)
 })

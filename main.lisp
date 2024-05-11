@@ -14,11 +14,11 @@
 (import "pkg::disp-gauges@://vesc_packages/lib_disp_ui/disp_ui.vescpkg" 'disp-gauges)
 (read-eval-program disp-gauges)
 
-(import "fonts/font_12_15.bin" 'font15)
-(import "fonts/font_15_18.bin" 'font18)
+(import "fonts/font_12_15_aa.bin" 'font15)
+(import "fonts/font_15_18_aa.bin" 'font18)
 ;;(import "fonts/font_22_24.bin" 'font24)
-(import "fonts/font_60_88.bin" 'font88)
-(import "fonts/font_77_128.bin" 'font128)
+(import "fonts/font_60_88_aa.bin" 'font88)
+(import "fonts/font_77_128_aa.bin" 'font128)
 
 (import "assets/speed-stripe-4c.bin" 'icon-stripe)
 (import "assets/motor-4c.bin" 'icon-motor)

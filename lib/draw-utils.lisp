@@ -112,27 +112,26 @@
     })
 })
 
-(defun draw-battery-soc (img w h font soc) {
+(defun draw-battery-soc (img w h soc) {
     (if (> soc 100) (setq soc 100))
-    (var font-h (bufget-u8 font 1))
-    (txt-block-c img 1 (/ w 2) 0 font (str-merge (str-from-n soc "%d") "%"))
+
     ;(img-rectangle img x y width height color opt-attr1
 
     (var bat-left 4)
-    (var bat-top (+ font-h 4))
+    (var bat-top 4)
     ; Outline
-    (img-rectangle img bat-left (+ bat-top 5) (- w 8) (- h font-h 16) 1 '(thickness 3)) ; TODO: thickness 2 is coming out 1 with rounded
+    (img-rectangle img bat-left (+ bat-top 5) (- w 8) (- h 16) 1 '(thickness 3)) ; TODO: thickness 2 is coming out 1 with rounded
     ; Nub
     (img-rectangle img (+ bat-left 3) bat-top (- w 16) 7 1 '(thickness 2))
 
     ; Fill
-    (def fill-h (* (- h font-h 16 4) (/ soc 100.0)))
+    (def fill-h (* (- h 16 bat-top 2) soc))
     (if (< fill-h 1) (setq fill-h 1))
-    (img-rectangle img 7 (+ (+ bat-top 5 2) (- h fill-h font-h bat-top)) (- w 8 5) fill-h 2 '(filled))
+    (img-rectangle img 7 (+ (+ bat-top 5 2) (- h fill-h bat-top 16)) (- w 8 5) fill-h 2 '(filled))
 })
 
 (defun draw-units (img x y color font) {
-    (txt-block-l img color x y font (cdr settings-units))
+    (txt-block-l img color x y font (to-str (cdr settings-units)))
 })
 
 
@@ -169,12 +168,12 @@
     (var x4 (+ x (* w 0.68)))
     (var y4 y1)
 
-    (img-line img x1 y1 x2 y2 1 '(thickness 1))
+    (img-line img x1 y1 x2 y2 color '(thickness 1))
 
-    (img-line img x2 y2 x4 y4 1 '(thickness 1))
-    (img-line img x3 y3 x4 y4 1 '(thickness 1))
+    (img-line img x2 y2 x4 y4 color '(thickness 1))
+    (img-line img x3 y3 x4 y4 color '(thickness 1))
     
-    (img-line img x1 y1 x3 y3 1 '(thickness 1))
+    (img-line img x1 y1 x3 y3 color '(thickness 1))
 })
 
 (defun draw-arrow-right (img x y w h color) {
@@ -190,12 +189,12 @@
     (var x4 (- x (* w 0.68)))
     (var y4 y1)
 
-    (img-line img x1 y1 x2 y2 1 '(thickness 1))
+    (img-line img x1 y1 x2 y2 color '(thickness 1))
 
-    (img-line img x2 y2 x4 y4 1 '(thickness 1))
-    (img-line img x3 y3 x4 y4 1 '(thickness 1))
+    (img-line img x2 y2 x4 y4 color '(thickness 1))
+    (img-line img x3 y3 x4 y4 color '(thickness 1))
     
-    (img-line img x1 y1 x3 y3 1 '(thickness 1))
+    (img-line img x1 y1 x3 y3 color '(thickness 1))
 })
 
 ; img = image buffer

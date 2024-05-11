@@ -1,7 +1,7 @@
 @const-start
 
 (defun view-init-minigame () {
-    (def buf-game-over (img-buffer 'indexed2 196 60))
+    (def buf-game-over (img-buffer 'indexed4 196 60))
     (def game-score 0)
     (def game-seconds 0)
     (def game-start-time (systime))
@@ -66,8 +66,8 @@
 (defunret view-draw-minigame () {
 
     (if game-over {
-        (txt-block-c buf-game-over 1 (/ (first (img-dims buf-game-over)) 2) 6 font15 (list
-            "Game Over"
+        (txt-block-c buf-game-over (list 0 1 2 3) (/ (first (img-dims buf-game-over)) 2) 6 font15 (list
+            (to-str "Game Over")
             (str-merge (str-from-n game-score "%d point") (if (not-eq game-score 1) "s" ""))
             (str-merge (str-from-n game-seconds "%d second") (if (not-eq game-seconds 1) "s" ""))
         ))
@@ -187,7 +187,7 @@
         (disp-render buf-ball ball-x ball-y '(0x000000 0xfbfcfc))
 
         
-    } (disp-render buf-game-over (- 160 (/ (first (img-dims buf-game-over)) 2)) (+ bricks-row-y 42) '(0x000000 0xfbfcfc)))
+    } (disp-render buf-game-over (- 160 (/ (first (img-dims buf-game-over)) 2)) (+ bricks-row-y 42) '(0x000000 0x4f514f 0x929491 0xfbfcfc)))
 })
 
 (defun view-cleanup-minigame () {

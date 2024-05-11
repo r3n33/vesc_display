@@ -116,6 +116,8 @@
             (maybe-call (on-btn-3-long-pressed))
         })
 
+        (if (and (>= (secs-since btn-1-start) 6.13) btn-1-long-fired) (def state-view-next 'view-minigame))
+
         (if (= btn-0 0) (setq btn-0-long-fired false))
         (if (= btn-1 0) (setq btn-1-long-fired false))
         (if (= btn-2 0) (setq btn-2-long-fired false))

@@ -93,8 +93,9 @@
 
         (var smoothing 0.1)
         (setq frame-ms (+ (* (* (secs-since start) 1000) smoothing) (* frame-ms (- 1.0 smoothing))))
-        (if (> last-frame-time 0)
-            (setq fps (+ (* (/ 1.0 (secs-since last-frame-time)) smoothing) (* fps (- 1.0 smoothing))))
+        (var frame-seconds (secs-since last-frame-time))
+        (if (> frame-seconds 0.0)
+            (setq fps (+ (* (/ 1.0 frame-seconds) smoothing) (* fps (- 1.0 smoothing))))
         )
         (setq last-frame-time (systime))
 

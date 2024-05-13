@@ -113,7 +113,8 @@
 })
 
 (defun draw-battery-soc (img w h soc) {
-    (if (> soc 100) (setq soc 100))
+    (if (< soc 0.0) (setq soc 0.0))
+    (if (> soc 1.0) (setq soc 1.0))
 
     ;(img-rectangle img x y width height color opt-attr1
 

@@ -15,7 +15,7 @@
         (loopwhile t
             (progn
                 (select-motor 1)
-                (bufset-i16 buf-canid20 0 (* (/ (- (get-vin) 12.0) 15.0) 1000))
+                (bufset-i16 buf-canid20 0 (* (get-batt) 1000))
                 (bufset-i16 buf-canid20 2 (* (abs (get-duty)) 1000))
                 (bufset-i16 buf-canid20 4 (* (abs (get-speed)) 3.6 10))
                 (bufset-i16 buf-canid20 6 (* (get-current-in) (get-vin) 2 0.1))

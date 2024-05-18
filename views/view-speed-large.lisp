@@ -7,9 +7,7 @@
     (def buf-speed-large (img-buffer 'indexed4 240 128))
 
     (view-init-menu)
-    (defun on-btn-0-pressed () {
-        (def state-view-next 'view-dash-primary)
-    })
+    (defun on-btn-0-pressed () (def state-view-next (previous-view)))
     (defun on-btn-1-pressed () {
         (stats-reset-max)
     })
@@ -17,9 +15,7 @@
         (setting-units-cycle)
         (def view-previous-stats (list 'stats-kmh 'stats-kmh-max))
     })
-    (defun on-btn-3-pressed () {
-        (def state-view-next 'view-statistics)
-    })
+    (defun on-btn-3-pressed () (def state-view-next (next-view)))
 
     (def view-changed nil)
     (def view-previous-stats (list 'stats-kmh 'stats-kmh-max))

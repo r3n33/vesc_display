@@ -17,13 +17,30 @@
     (gpio-write 5 1) ; enable display backlight
 })
 
-(def views (list 'view-dash-primary 'view-speed-large 'view-statistics 'view-minigame))
+(def views (list 'view-dash-primary 'view-speed-large 'view-statistics 'view-settings 'view-minigame))
+
+(defun next-view () (match state-view
+    (view-dash-primary 'view-speed-large)
+    (view-speed-large 'view-statistics)
+    (view-statistics 'view-settings)
+    (view-settings nil)
+    (_ nil)
+))
+
+(defun previous-view () (match state-view
+    (view-dash-primary nil)
+    (view-speed-large 'view-dash-primary)
+    (view-statistics 'view-speed-large)
+    (view-settings 'view-statistics)
+    (_ nil)
+))
 
 (defun init-current-view () {
     (match state-view
         (view-dash-primary (view-init-dash-primary))
         (view-speed-large (view-init-speed-large))
         (view-statistics (view-init-statistics))
+        (view-settings (view-init-settings))
         (view-minigame (view-init-minigame))
         (_ (print "state-view is unknown"))
     )
@@ -50,6 +67,7 @@
         (view-dash-primary (view-draw-dash-primary))
         (view-speed-large (view-draw-speed-large))
         (view-statistics (view-draw-statistics))
+        (view-settings (view-draw-settings))
         (view-minigame (view-draw-minigame))
         (_ (print "state-view is unknown"))
     )
@@ -59,6 +77,7 @@
         (view-dash-primary (view-render-dash-primary))
         (view-speed-large (view-render-speed-large))
         (view-statistics (view-render-statistics))
+        (view-settings (view-render-settings))
         (view-minigame (view-render-minigame))
         (_ (print "state-view is unknown"))
     )
@@ -69,6 +88,7 @@
         (view-dash-primary (view-cleanup-dash-primary))
         (view-speed-large (view-cleanup-speed-large))
         (view-statistics (view-cleanup-statistics))
+        (view-settings (view-cleanup-settings))
         (view-minigame (view-cleanup-minigame))
         (_ (print "state-view is unknown"))
     )

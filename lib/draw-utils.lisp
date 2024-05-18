@@ -156,6 +156,48 @@
     (img-line img x1 y1 x3 y3 1 '(thickness 1)) ; TODO: x1 y1 x3 y3 is not the same as x3 y3 x1 y1
 })
 
+(defun draw-arrow-up (img x y w h color) {
+    (var x1 (+ x (/ w 2)))
+    (var y1 y)
+
+    (var x2 x)
+    (var x3 (+ x w))
+
+    (var y2 (+ y h))
+    (var y3 (+ y h))
+
+    (var x4 x1)
+    (var y4 (+ y (* h 0.68)))
+
+    (img-line img x1 y1 x2 y2 color '(thickness 1))
+
+    (img-line img x2 y2 x4 y4 color '(thickness 1))
+    (img-line img x3 y3 x4 y4 color '(thickness 1))
+
+    (img-line img x1 y1 x3 y3 color '(thickness 1))
+})
+
+(defun draw-arrow-down (img x y w h color) {
+    (var x1 (+ x (/ w 2)))
+    (var y1 (+ y h))
+
+    (var x2 x)
+    (var x3 (+ x w))
+
+    (var y2 y)
+    (var y3 y)
+
+    (var x4 x1)
+    (var y4 (- (+ y h) (* h 0.68)))
+
+    (img-line img x1 y1 x2 y2 color '(thickness 1))
+
+    (img-line img x2 y2 x4 y4 color '(thickness 1))
+    (img-line img x3 y3 x4 y4 color '(thickness 1))
+
+    (img-line img x1 y1 x3 y3 color '(thickness 1))
+})
+
 (defun draw-arrow-left (img x y w h color) {
     (var x1 x)
     (var y1 (+ y (/ h 2)))

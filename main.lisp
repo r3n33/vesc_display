@@ -16,7 +16,7 @@
 
 (import "fonts/font_12_15_aa.bin" 'font15)
 (import "fonts/font_15_18_aa.bin" 'font18)
-;;(import "fonts/font_22_24.bin" 'font24)
+(import "fonts/font_22_24_aa.bin" 'font24)
 (import "fonts/font_60_88_aa.bin" 'font88)
 (import "fonts/font_77_128_aa.bin" 'font128)
 
@@ -25,7 +25,7 @@
 (import "assets/esc-4c.bin" 'icon-esc)
 (import "assets/battery-4c.bin" 'icon-battery)
 (import "assets/warning-4c.bin" 'icon-warning)
-;;(import "assets/service-4c.bin" 'icon-service)
+(import "assets/bike-6c.bin" 'icon-bike)
 
 (import "lib/user-settings.lisp" 'code-user-settings)
 (read-eval-program code-user-settings)
@@ -44,6 +44,9 @@
 
 (import "views/view-statistics.lisp" 'code-view-statistics)
 (read-eval-program code-view-statistics)
+
+(import "views/view-settings.lisp" 'code-view-settings)
+(read-eval-program code-view-settings)
 
 (import "views/view-minigame.lisp" 'code-view-minigame)
 (read-eval-program code-view-minigame)

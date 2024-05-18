@@ -32,9 +32,7 @@
         (setix view-previous-stats 3 'stats-temp-esc)
         (setix view-previous-stats 4 'stats-temp-motor)
     })
-    (defun on-btn-3-pressed () {
-        (def state-view-next 'view-speed-large)
-    })
+    (defun on-btn-3-pressed () (def state-view-next (next-view)))
 
     (def view-previous-stats (list 'stats-kmh 'stats-battery-soc 'stats-temp-battery 'stats-temp-esc 'stats-temp-motor 'stats-angle-pitch))
 

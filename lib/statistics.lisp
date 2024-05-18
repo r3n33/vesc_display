@@ -33,6 +33,10 @@
 (def stats-amps-now-min 0)
 (def stats-fault-codes-observed (list))
 
+; Computed Statistics (non-resettable)
+(def stats-active-timer 0)
+(def stats-active-timestamp nil)
+
 @const-start
 
 (defun stats-reset-max () {
@@ -85,6 +89,16 @@
             (if (not (list-find stats-fault-codes-observed stats-fault-code)) {
                 (setq stats-fault-codes-observed (append stats-fault-codes-observed (list stats-fault-code)))
             })
+        })
+
+        ; Usage Timer - Start
+        (if (and (> stats-kmh 0.0) (not stats-active-timestamp)) (def stats-active-timestamp (systime)))
+
+        ; Usage Timer - End
+        (if (and (= stats-kmh 0.0) (not-eq stats-active-timestamp nil)) {
+            (var millis-active (- (systime) stats-active-timestamp))
+            (setq stats-active-timer (+ stats-active-timer millis-active))
+            (def stats-active-timestamp nil)
         })
     })
 })

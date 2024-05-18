@@ -103,11 +103,11 @@
             ;TODO: Commenting for key repeat (setq btn-0-long-fired true)
             (maybe-call (on-btn-0-long-pressed))
         })
-        (if (and (>= btn-1 input-debounce-count) (>= (secs-since btn-1-start) 0.25) (not btn-1-long-fired)) {
+        (if (and (>= btn-1 input-debounce-count) (>= (secs-since btn-1-start) 2.0) (not btn-1-long-fired)) {
             (setq btn-1-long-fired true)
             (maybe-call (on-btn-1-long-pressed))
         })
-        (if (and (>= btn-2 input-debounce-count) (>= (secs-since btn-2-start) 0.25) (not btn-2-long-fired)) {
+        (if (and (>= btn-2 input-debounce-count) (>= (secs-since btn-2-start) 2.0) (not btn-2-long-fired)) {
             (setq btn-2-long-fired true)
             (maybe-call (on-btn-2-long-pressed))
         })

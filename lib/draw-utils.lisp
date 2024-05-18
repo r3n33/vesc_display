@@ -132,7 +132,7 @@
 })
 
 (defun draw-units (img x y color font) {
-    (txt-block-l img color x y font (to-str (cdr settings-units)))
+    (txt-block-l img color x y font (to-str (cdr settings-units-speeds)))
 })
 
 

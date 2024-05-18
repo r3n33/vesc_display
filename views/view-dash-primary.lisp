@@ -22,6 +22,15 @@
     (defun on-btn-2-pressed () {
         (setting-units-cycle)
         (setix view-previous-stats 0 'stats-kmh) ; Re-draw units
+        (setix view-previous-stats 2 'stats-temp-battery)
+        (setix view-previous-stats 3 'stats-temp-esc)
+        (setix view-previous-stats 4 'stats-temp-motor)
+    })
+    (defun on-btn-2-long-pressed () {
+        (setting-units-cycle-temps)
+        (setix view-previous-stats 2 'stats-temp-battery)
+        (setix view-previous-stats 3 'stats-temp-esc)
+        (setix view-previous-stats 4 'stats-temp-motor)
     })
     (defun on-btn-3-pressed () {
         (def state-view-next 'view-speed-large)
@@ -46,10 +55,10 @@
         (draw-units buf-units 0 0 (list 0 1 2 3) font15)
 
         (img-clear buf-speed)
-        (var speed-now (match (car settings-units) 
+        (var speed-now (match (car settings-units-speeds)
             (kmh stats-kmh)
-            (mph (* stats-kmh 0.621371))
-            (_ (print "Unexpected settings-units value"))
+            (mph (* stats-kmh km-to-mi))
+            (_ (print "Unexpected settings-units-speeds value"))
         ))
         (txt-block-c buf-speed (list 0 1 2 3) 87 0 font88 (str-from-n speed-now "%0.0f"))
     })
@@ -66,15 +75,33 @@
 
     (if (not-eq stats-temp-battery (ix view-previous-stats 2)) {
         (img-clear buf-battery-val)
-        (txt-block-c buf-battery-val (list 0 1 2 3) (/ (first (img-dims buf-battery-icon)) 2) 0 font18 (str-from-n (to-i stats-temp-battery) "%dC"))
+        (match (car settings-units-temps)
+            (celsius (txt-block-c buf-battery-val (list 0 1 2 3) (/ (first (img-dims buf-battery-icon)) 2) 0 font18 (str-from-n (to-i stats-temp-battery) "%dC")))
+            (fahrenheit {
+                (var battery-temp-f (c-to-f stats-temp-battery))
+                (txt-block-c buf-battery-val (list 0 1 2 3) (/ (first (img-dims buf-battery-icon)) 2) 0 font18 (str-from-n (to-i battery-temp-f) "%dF"))
+            })
+        )
     })
     (if (not-eq stats-temp-esc (ix view-previous-stats 3)) {
         (img-clear buf-esc-val)
-        (txt-block-c buf-esc-val (list 0 1 2 3) (/ (first (img-dims buf-esc-icon)) 2) 0 font18 (str-from-n (to-i stats-temp-esc) "%dC"))
+        (match (car settings-units-temps)
+            (celsius (txt-block-c buf-esc-val (list 0 1 2 3) (/ (first (img-dims buf-esc-icon)) 2) 0 font18 (str-from-n (to-i stats-temp-esc) "%dC")))
+            (fahrenheit {
+                (var esc-temp-f (c-to-f stats-temp-esc))
+                (txt-block-c buf-esc-val (list 0 1 2 3) (/ (first (img-dims buf-esc-icon)) 2) 0 font18 (str-from-n (to-i esc-temp-f) "%dF"))
+            })
+        )
     })
     (if (not-eq stats-temp-motor (ix view-previous-stats 4)) {
         (img-clear buf-motor-val)
-        (txt-block-c buf-motor-val (list 0 1 2 3) (/ (first (img-dims buf-motor-icon)) 2) 0 font18 (str-from-n (to-i stats-temp-motor) "%dC"))
+        (match (car settings-units-temps)
+            (celsius (txt-block-c buf-motor-val (list 0 1 2 3) (/ (first (img-dims buf-motor-icon)) 2) 0 font18 (str-from-n (to-i stats-temp-motor) "%dC")))
+            (fahrenheit {
+                (var motor-temp-f (c-to-f stats-temp-motor))
+                (txt-block-c buf-motor-val (list 0 1 2 3) (/ (first (img-dims buf-motor-icon)) 2) 0 font18 (str-from-n (to-i motor-temp-f) "%dF"))
+            })
+        )
     })
 
     (if (not-eq stats-angle-pitch (ix view-previous-stats 5)) {

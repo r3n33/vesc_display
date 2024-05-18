@@ -15,9 +15,13 @@
     (defun on-btn-0-pressed () {
         (def state-view-next 'view-speed-large)
     })
+    (defun on-btn-2-pressed () {
+        (setting-units-cycle)
+        (setix view-previous-stats 3 'stats-km) ; Re-draw units
+    })
 
     ; Render menu
-    (view-draw-menu 'arrow-left nil nil nil)
+    (view-draw-menu 'arrow-left nil "UNITS" nil)
     (view-render-menu)
 
     ; Render gauge background
@@ -42,22 +46,54 @@
 
         (def whkm 0)
         (if (> stats-km 0.0) (setq whkm (/ (- stats-wh stats-wh-chg) stats-km)))
-        (txt-block-l buf-efficiency (list 0 1 2 3) 0 0 font18 (list (to-str "Wh/km") (if (> whkm 10.0)
-            (str-from-n (to-i whkm) "%d")
-            (str-from-n whkm "%0.2f")
-        )))
+        (match (car settings-units-speeds)
+            (kmh {
+                (txt-block-l buf-efficiency (list 0 1 2 3) 0 0 font18 (list (to-str "Wh/km") (if (> whkm 10.0)
+                    (str-from-n (to-i whkm) "%d")
+                    (str-from-n whkm "%0.2f")
+                )))
+            })
+            (mph {
+                (var whmi (* whkm km-to-mi))
+                (txt-block-l buf-efficiency (list 0 1 2 3) 0 0 font18 (list (to-str "Wh/mi") (if (> whmi 10.0)
+                    (str-from-n (to-i whmi) "%d")
+                    (str-from-n whmi "%0.2f")
+                )))
+            })
+            (_ (print "Unexpected settings-units-speeds value"))
+        )
 
-        (txt-block-l buf-trip (list 0 1 2 3) 0 0 font18 (list (to-str "Trip") (str-from-n stats-km (if (> stats-km 99.9) "%0.0fkm" "%0.1fkm"))))
+        (match (car settings-units-speeds)
+            (kmh {
+                (txt-block-l buf-trip (list 0 1 2 3) 0 0 font18 (list (to-str "Trip") (str-from-n stats-km (if (> stats-km 99.9) "%0.0fkm" "%0.1fkm"))))
+            })
+            (mph {
+                (var stat-mi (* stats-km km-to-mi))
+                (txt-block-l buf-trip (list 0 1 2 3) 0 0 font18 (list (to-str "Trip") (str-from-n stat-mi (if (> stat-mi 99.9) "%0.0fmi" "%0.1fmi"))))
+            })
+            (_ (print "Unexpected settings-units-speeds value"))
+        )
 
         ; Calculate range
         (var ah-remaining (* stats-battery-ah stats-battery-soc))
         (var wh-remaining (* ah-remaining stats-vin))
         (var range-remaining 0)
-        (if (> whkm 0) (setq range-remaining (/ wh-remaining whkm))) 
-        (txt-block-l buf-range (list 0 1 2 3) 0 0 font18 (list (to-str "Range") (if (> range-remaining 10.0)
-            (str-from-n (to-i range-remaining) "%dkm")
-            (str-from-n range-remaining "%0.1fkm")
-        )))
+        (if (> whkm 0) (setq range-remaining (/ wh-remaining whkm)))
+        (match (car settings-units-speeds)
+            (kmh {
+                (txt-block-l buf-range (list 0 1 2 3) 0 0 font18 (list (to-str "Range") (if (> range-remaining 10.0)
+                    (str-from-n (to-i range-remaining) "%dkm")
+                    (str-from-n range-remaining "%0.1fkm")
+                )))
+            })
+            (mph {
+                (txt-block-l buf-range (list 0 1 2 3) 0 0 font18 (list (to-str "Range") (if (> range-remaining 10.0)
+                    (str-from-n (to-i range-remaining) "%dmi")
+                    (str-from-n range-remaining "%0.1fmi")
+                )))
+            })
+            (_ (print "Unexpected settings-units-speeds value"))
+        )
     })
 })
 

@@ -2,6 +2,14 @@
 
 @const-start
 
+(defun esc-request (code) {
+    (var ret (rcode-run 10 2 code))
+    (if (eq 'timeout ret) {
+        (print "esc-request: timeout")
+        nil
+    } ret )
+})
+
 (defun proc-data (src des data rssi) {
     ; Ignore broadcast, only handle data sent directly to us
     (if (not-eq des broadcast-addr) {

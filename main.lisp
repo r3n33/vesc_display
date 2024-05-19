@@ -1,9 +1,11 @@
 @const-symbol-strings
 
 (def init-complete nil)
-(loopwhile (not (main-init-done)) (sleep 0.1))
 
 @const-start
+
+(import "pkg@://vesc_packages/lib_code_server/code_server.vescpkg" 'code-server)
+(read-eval-program code-server)
 
 (import "pkg::disp-text@://vesc_packages/lib_disp_ui/disp_ui.vescpkg" 'disp-text)
 (read-eval-program disp-text)

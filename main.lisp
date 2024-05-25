@@ -22,6 +22,7 @@
 (import "fonts/font_60_88_aa.bin" 'font88)
 (import "fonts/font_77_128_aa.bin" 'font128)
 
+(import "assets/logo-16c.bin" 'icon-logo)
 (import "assets/speed-stripe-4c.bin" 'icon-stripe)
 (import "assets/motor-4c.bin" 'icon-motor)
 (import "assets/esc-4c.bin" 'icon-esc)
@@ -34,6 +35,9 @@
 
 (import "lib/statistics.lisp" 'code-statistics)
 (read-eval-program code-statistics)
+
+(import "views/components/view-startup.lisp" 'code-view-startup)
+(read-eval-program code-view-startup)
 
 (import "views/components/view-menu.lisp" 'code-view-menu)
 (read-eval-program code-view-menu)
@@ -69,7 +73,6 @@
 
 (display-init)
 
-;(import "tests/display-tests.lisp" 'code-display-tests)
-;(read-eval-program code-display-tests)
+(start-boot-animation)
 
 (def init-complete true)

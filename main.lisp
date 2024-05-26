@@ -23,7 +23,10 @@
 (import "fonts/font_77_128_aa.bin" 'font128)
 
 (import "assets/logo-16c.bin" 'icon-logo)
-(import "assets/speed-stripe-4c.bin" 'icon-stripe)
+(import "assets/stripes-bare-15c.bin" 'icon-stripe)
+(import "assets/stripes-top-7c.bin" 'icon-stripe-top)
+(import "assets/stripes-arrow-l-15c.bin" 'icon-arrow-l)
+(import "assets/stripes-arrow-r-15c.bin" 'icon-arrow-r)
 (import "assets/motor-4c.bin" 'icon-motor)
 (import "assets/esc-4c.bin" 'icon-esc)
 (import "assets/battery-4c.bin" 'icon-battery)

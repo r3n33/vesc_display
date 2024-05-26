@@ -2,6 +2,12 @@
 
 (defun view-init-dash-primary  () {
     (def buf-stripe-bg (img-buffer-from-bin icon-stripe))
+    (def buf-stripe-fg (img-buffer 'indexed16 141 19))
+    (def buf-stripe-top (img-buffer-from-bin icon-stripe-top))
+    (def buf-arrow-l (img-buffer-from-bin icon-arrow-l))
+    (def buf-arrow-r (img-buffer-from-bin icon-arrow-r))
+    (img-blit buf-stripe-fg buf-stripe-top 0 0 -1)
+
     (def buf-motor-icon (img-buffer-from-bin icon-motor))
     (def buf-esc-icon (img-buffer-from-bin icon-esc))
     (def buf-battery-icon (img-buffer-from-bin icon-battery))
@@ -38,7 +44,24 @@
 
     (view-draw-menu nil nil "UNITS" 'arrow-right)
     (view-render-menu)
-    (disp-render buf-stripe-bg 5 68 '(0x000000 0x1e9af3 0x22c7ff 0x22c7ff))
+    (disp-render buf-stripe-bg 5 68
+        '(
+            0x000000
+            0x1d9af7 ; top fg
+            0x1574b6 ; 2
+            0x0e5179 ; 3
+            0x143e59 ; 4
+            0x0e222f ; 5
+            0x00c7ff ; bottom fg
+            0x10b2e6 ; 7
+            0x1295bf ; 8
+            0x0984ac ; 9
+            0x007095 ; a
+            0x0e5179 ; b
+            0x08475c ; c
+            0x143e59 ; d
+            0x0e222f ; e
+        ))
     (def buf-stripe-bg nil)
     (var colors-text-aa '(0x000000 0x4f514f 0x929491 0xfbfcfc))
     (disp-render buf-motor-icon 8 10 colors-text-aa)
@@ -59,6 +82,20 @@
             (_ (print "Unexpected settings-units-speeds value"))
         ))
         (txt-block-c buf-speed (list 0 1 2 3) 87 0 font88 (str-from-n speed-now "%0.0f"))
+
+        ; Update Speed Arrow
+        (var arrow-x-max (- 141 24))
+        (def arrow-x (if (> stats-kmh-max 0.0)
+            (* arrow-x-max (/ stats-kmh stats-kmh-max))
+            0
+        ))
+        (img-blit buf-stripe-fg buf-stripe-top 0 0 -1)
+        (if (> arrow-x 0) {
+            ; Fill area behind arrow
+            (img-rectangle buf-stripe-fg 0 0 arrow-x 19 1 '(filled))
+        })
+        (img-blit buf-stripe-fg buf-arrow-l arrow-x 0 -1)
+        (img-blit buf-stripe-fg buf-arrow-r (+ arrow-x 12) 0 -1)
     })
     (if (not-eq (to-i (* 100 stats-battery-soc)) (second view-previous-stats)) {
         ; Update Battery %
@@ -137,6 +174,25 @@
     (if (not-eq stats-kmh (first view-previous-stats)) {
         (disp-render buf-speed 0 105 colors-text-aa)
         (disp-render buf-units 175 197 colors-text-aa)
+
+        (disp-render buf-stripe-fg 5 68
+            '(
+                0x000000
+                0x1d9af7 ; top fg
+                0x1574b6 ; 2
+                0x0e5179 ; 3
+                0x143e59 ; 4
+                0x0e222f ; 5
+                0x00c7ff ; bottom fg
+                0x10b2e6 ; 7
+                0x1295bf ; 8
+                0x0984ac ; 9
+                0x007095 ; a
+                0x0e5179 ; b
+                0x08475c ; c
+                0x143e59 ; d
+                0x0e222f ; e
+            ))
     })
     
     (if (not-eq (to-i (* 100 stats-battery-soc)) (second view-previous-stats)) {
@@ -172,6 +228,7 @@
 
 (defun view-cleanup-dash-primary () {
     (def buf-stripe-bg nil)
+    (def buf-stripe-fg nil)
     (def buf-motor-icon nil)
     (def buf-esc-icon nil)
     (def buf-battery-icon nil)

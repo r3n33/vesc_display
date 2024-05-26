@@ -324,3 +324,72 @@
         (cons 'changed false)
     )
 })
+
+; Returns a list of values of specified length, covering a specified range.
+; The range is inclusive.
+(defun evenly-place-points (from to len) {
+    (var diff (- to from))
+    (var delta (/ diff (- len 1)))
+
+    (map (fn (n) (+ (* delta n) from)) (range len))
+})
+
+; Clamp value to range 0-1
+(defun clamp01 (v)
+    (cond
+        ((< v 0.0) 0.0)
+        ((> v 1.0) 1.0)
+        (t v)
+))
+
+; Map and clamp the range min-max to 0-1
+(defun map-range-01 (v min max)
+    (clamp01 (/ (- (to-float v) min) (- max min)))
+)
+
+(define max-in-list
+    (lambda (lst)
+        (if (eq lst nil)
+            nil
+            (let ((max-helper (lambda (lst current-max)
+                                (if (eq lst nil)
+                                    current-max
+                                    (max-helper (cdr lst) (if (> (car lst) current-max) (car lst) current-max))))))
+            (max-helper (cdr lst) (car lst))))))
+
+(define min-in-list
+    (lambda (lst)
+        (if (eq lst nil)
+            nil
+            (let ((min-helper (lambda (lst current-min)
+                                (if (eq lst nil)
+                                    current-min
+                                    (min-helper (cdr lst) (if (< (car lst) current-min) (car lst) current-min))))))
+            (min-helper (cdr lst) (car lst))))))
+
+(defun draw-live-chart (img x y w h color thickness values) {
+    (var x-pos (evenly-place-points x (+ x w) (length values)))
+    (var i 0)
+    (var x-pre 0)
+    (var y-pre 0)
+    (var val-min (min-in-list values))
+    (var val-max (max-in-list values))
+    (loopwhile (< i (length values)) {
+        (var y-pct (if (not-eq val-min val-max)
+            (map-range-01 (ix values i) val-min val-max)
+            (if (= val-max 0.0) 0.0 1.0)
+        ))
+        (var y-pos (+ y (* (- 1.0 y-pct) (- h 5))))
+        ; Special case for first item
+        (if (not-eq i 0) {
+            ; Draw a line from x-pre to (ix x-pos i) and y-pre to y-pos
+            (img-line img x-pre y-pre (ix x-pos i) y-pos color `(thickness ,thickness))
+        })
+        ; Set previous values for next iteration
+        (setq x-pre (ix x-pos i))
+        (setq y-pre y-pos)
+        ; Increment
+        (setq i (+ i 1))
+    })
+
+})

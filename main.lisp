@@ -54,6 +54,9 @@
 (import "views/view-statistics.lisp" 'code-view-statistics)
 (read-eval-program code-view-statistics)
 
+(import "views/view-live-chart.lisp" 'code-view-live-chart)
+(read-eval-program code-view-live-chart)
+
 (import "views/view-settings.lisp" 'code-view-settings)
 (read-eval-program code-view-settings)
 

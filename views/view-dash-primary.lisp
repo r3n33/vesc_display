@@ -229,6 +229,9 @@
 (defun view-cleanup-dash-primary () {
     (def buf-stripe-bg nil)
     (def buf-stripe-fg nil)
+    (def buf-stripe-top nil)
+    (def buf-arrow-l nil)
+    (def buf-arrow-r nil)
     (def buf-motor-icon nil)
     (def buf-esc-icon nil)
     (def buf-battery-icon nil)

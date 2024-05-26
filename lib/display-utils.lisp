@@ -13,7 +13,7 @@
     (disp-reset)
     (ext-disp-orientation 3)
     (disp-clear)
-
+    (sleep 0.1) ; Small delay to ensure display is clear before backlight activation
     (gpio-write 5 1) ; enable display backlight
 })
 

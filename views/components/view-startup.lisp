@@ -2,7 +2,7 @@
     (var logo (img-buffer-from-bin icon-logo))
 
     ; First stripe
-    (disp-render logo (- 160 (/ (first (img-dims logo)) 2)) 68
+    (disp-render logo (- 160 (/ (first (img-dims logo)) 2)) (- 120 (/ (second (img-dims logo)) 2))
         '(  0x000000
             0x009edf
             0x007dc4
@@ -14,7 +14,7 @@
     (sleep 0.5)
 
     ; Second stripe
-    (disp-render logo (- 160 (/ (first (img-dims logo)) 2)) 68
+    (disp-render logo (- 160 (/ (first (img-dims logo)) 2)) (- 120 (/ (second (img-dims logo)) 2))
         '(  0x000000
             0x009edf
             0x007dc4
@@ -43,7 +43,7 @@
         (var logo-color-e (lerp-color 0x000000 0x575a59 pct))
         (var logo-color-f (lerp-color 0x000000 0x272928 pct))
 
-        (disp-render logo (- 160 (/ (first (img-dims logo)) 2)) 68
+        (disp-render logo (- 160 (/ (first (img-dims logo)) 2)) (- 120 (/ (second (img-dims logo)) 2))
             `(  0x000000
                 0x009edf
                 0x007dc4
@@ -66,7 +66,7 @@
         )
         (sleep 0.04)
     })
-    (disp-render logo (- 160 (/ (first (img-dims logo)) 2)) 68
+    (disp-render logo (- 160 (/ (first (img-dims logo)) 2)) (- 120 (/ (second (img-dims logo)) 2))
         '(  0x000000
             0x009edf
             0x007dc4

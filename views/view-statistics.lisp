@@ -43,7 +43,7 @@
         (img-clear buf-trip)
         (img-clear buf-range)
 
-        (def whkm 0)
+        (def whkm 0.0)
         (if (> stats-km 0.0) (setq whkm (/ (- stats-wh stats-wh-chg) stats-km)))
         (match (car settings-units-speeds)
             (kmh {
@@ -53,7 +53,8 @@
                 )))
             })
             (mph {
-                (var whmi (* whkm km-to-mi))
+                (var whmi 0.0)
+                (if (> stats-km 0.0) (setq whmi (/ (- stats-wh stats-wh-chg) (* stats-km km-to-mi))))
                 (txt-block-l buf-efficiency (list 0 1 2 3) 0 0 font18 (list (to-str "Wh/mi") (if (> whmi 10.0)
                     (str-from-n (to-i whmi) "%d")
                     (str-from-n whmi "%0.2f")

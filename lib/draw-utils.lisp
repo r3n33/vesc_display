@@ -391,5 +391,5 @@
         ; Increment
         (setq i (+ i 1))
     })
-
+    (list val-min val-max)
 })

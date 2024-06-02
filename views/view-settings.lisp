@@ -15,7 +15,8 @@
     (txt-block-l buf-settings-submenu (list 0 1 2 3) 0 0 font24 (to-str "Save"))
 
     ; Get latest settings from ESC
-    (def esc-opt-wheel-diameter (* (esc-request '(conf-get 'si-wheel-diameter)) 1000))
+    (def esc-opt-wheel-diameter (esc-request '(conf-get 'si-wheel-diameter)))
+    (if esc-opt-wheel-diameter (setq esc-opt-wheel-diameter (* esc-opt-wheel-diameter 1000)))
     (def esc-opt-batt-cells (esc-request '(conf-get 'si-battery-cells)))
     (def esc-opt-batt-amps-max (esc-request '(conf-get 'l-current-max)))
 
@@ -139,12 +140,12 @@
 
         ; Show latest values received from ESC
         (txt-block-l buf-settings-opt0 (list 0 1 2 3) 0 0 font24
-            (str-from-n (if (eq 0 view-settings-index-editing) view-settings-index-value esc-opt-wheel-diameter) "Wheel: %0.0fmm")
+            (str-from-n (if (eq 0 view-settings-index-editing) view-settings-index-value (to-float esc-opt-wheel-diameter)) "Wheel: %0.0fmm")
         )
         (txt-block-l buf-settings-opt1 (list 0 1 2 3) 0 0 font24
-            (str-from-n (if (eq 1 view-settings-index-editing) view-settings-index-value esc-opt-batt-amps-max) "Batt : %0.0fA"))
+            (str-from-n (if (eq 1 view-settings-index-editing) view-settings-index-value (to-float esc-opt-batt-amps-max)) "Batt : %0.0fA"))
         (txt-block-l buf-settings-opt2 (list 0 1 2 3) 0 0 font24
-            (str-from-n (if (eq 2 view-settings-index-editing) view-settings-index-value esc-opt-batt-cells) "Batt : %dS"))
+            (str-from-n (if (eq 2 view-settings-index-editing) view-settings-index-value (to-i esc-opt-batt-cells)) "Batt : %dS"))
         (txt-block-l buf-settings-opt3 (list 0 1 2 3) 0 0 font24
             (to-str "Motor: Stock"))
 

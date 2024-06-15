@@ -381,3 +381,16 @@
     })
     (list val-min val-max)
 })
+
+; Rotates a point around the origin in the clockwise direction. (note that the
+; coordinate system is upside down). The returned position is a list containing
+; the x and y coordinates. Angle is in degrees.
+(defun rot-point-origin (x y angle) {
+    (var s (sin (deg2rad angle)))
+    (var c (cos (deg2rad angle)))
+
+    (list
+        (- (* x c) (* y s))
+        (+ (* x s) (* y c))
+    )
+})

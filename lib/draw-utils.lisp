@@ -347,25 +347,13 @@
     (clamp01 (/ (- (to-float v) min) (- max min)))
 )
 
-(define max-in-list
-    (lambda (lst)
-        (if (eq lst nil)
-            nil
-            (let ((max-helper (lambda (lst current-max)
-                                (if (eq lst nil)
-                                    current-max
-                                    (max-helper (cdr lst) (if (> (car lst) current-max) (car lst) current-max))))))
-            (max-helper (cdr lst) (car lst))))))
+(defun max-in-list (lst) {
+    (first (sort > lst))
+})
 
-(define min-in-list
-    (lambda (lst)
-        (if (eq lst nil)
-            nil
-            (let ((min-helper (lambda (lst current-min)
-                                (if (eq lst nil)
-                                    current-min
-                                    (min-helper (cdr lst) (if (< (car lst) current-min) (car lst) current-min))))))
-            (min-helper (cdr lst) (car lst))))))
+(defun min-in-list (lst) {
+    (first (sort < lst))
+})
 
 (defun draw-live-chart (img x y w h color thickness values) {
     (var x-pos (evenly-place-points x (+ x w) (length values)))

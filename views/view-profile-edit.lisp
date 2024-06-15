@@ -19,7 +19,7 @@
     (view-render-menu)
 })
 
-; Level 1: Selecting value for current option being edited
+; Level 1: Editing value for selected option
 (defun set-menu-edit-option () {
     (defun on-btn-0-pressed () {
         (setq view-profile-mode 'select-option)
@@ -40,15 +40,26 @@
 
 (defun view-init-profile-edit () {
     (var buf-title (img-buffer 'indexed4 240 30))
-    (txt-block-r buf-title (list 0 1 2 3) 240 0 font18 (to-str "Edit Profile 1"))
+    (txt-block-r buf-title (list 0 1 2 3) 240 0 font18
+        (str-from-n (+ profile-active 1) "Edit Profile %d") ; TODO: use persistent setting
+    )
     (disp-render buf-title 80 4 '(0x000000 0x4f514f 0x929491 0xfbfcfc))
+
+    (def profile-edit-item 0)
 
     (def view-profile-mode 'select-option)
     (set-menu-select-option)
 })
 
 (defun view-draw-profile-edit () {
-    
+    (match view-profile-mode
+        ('select-option {
+
+        })
+        ('edit-option {
+            
+        })
+    )
 })
 
 (defun view-render-profile-edit () {

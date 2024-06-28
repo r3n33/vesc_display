@@ -15,14 +15,13 @@
     (set-io 3 1) ; enable display backlight
 })
 
-(def views (list 'view-dash-primary 'view-speed-large 'view-statistics 'view-live-chart 'view-settings 'view-minigame))
+(def views (list 'view-dash-primary 'view-speed-large 'view-statistics 'view-live-chart 'view-minigame))
 
 (defun next-view () (match state-view
     (view-dash-primary 'view-speed-large)
     (view-speed-large 'view-statistics)
     (view-statistics 'view-live-chart)
-    (view-live-chart 'view-settings)
-    (view-settings nil)
+    (view-live-chart nil)
     (_ nil)
 ))
 
@@ -31,7 +30,6 @@
     (view-speed-large 'view-dash-primary)
     (view-statistics 'view-speed-large)
     (view-live-chart 'view-statistics)
-    (view-settings 'view-live-chart)
     (_ nil)
 ))
 
@@ -41,7 +39,6 @@
         (view-speed-large (view-init-speed-large))
         (view-statistics (view-init-statistics))
         (view-live-chart (view-init-chart))
-        (view-settings (view-init-settings))
         (view-minigame (view-init-minigame))
         (_ (print "state-view is unknown"))
     )
@@ -69,7 +66,6 @@
         (view-speed-large (view-draw-speed-large))
         (view-statistics (view-draw-statistics))
         (view-live-chart (view-draw-chart))
-        (view-settings (view-draw-settings))
         (view-minigame (view-draw-minigame))
         (_ (print "state-view is unknown"))
     )
@@ -80,7 +76,6 @@
         (view-speed-large (view-render-speed-large))
         (view-statistics (view-render-statistics))
         (view-live-chart (view-render-chart))
-        (view-settings (view-render-settings))
         (view-minigame (view-render-minigame))
         (_ (print "state-view is unknown"))
     )
@@ -92,7 +87,6 @@
         (view-speed-large (view-cleanup-speed-large))
         (view-statistics (view-cleanup-statistics))
         (view-live-chart (view-cleanup-chart))
-        (view-settings (view-cleanup-settings))
         (view-minigame (view-cleanup-minigame))
         (_ (print "state-view is unknown"))
     )

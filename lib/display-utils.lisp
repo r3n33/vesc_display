@@ -6,15 +6,13 @@
 
 @const-start
 
-(gpio-configure 5 'pin-mode-out)
-
 (defun display-init () {
     (disp-load-st7789 7 6 10 20 8 40) ; Args: sda clock cs reset dc mhz
     (disp-reset)
     (ext-disp-orientation 3)
     (disp-clear)
     (sleep 0.1) ; Small delay to ensure display is clear before backlight activation
-    (gpio-write 5 1) ; enable display backlight
+    (set-io 3 1) ; enable display backlight
 })
 
 (def views (list 'view-dash-primary 'view-speed-large 'view-statistics 'view-live-chart 'view-settings 'view-minigame))

@@ -31,11 +31,6 @@
     (def on-btn-3-long-pressed nil)
 })
 
-@const-end
-(def adc-buf '(0 0 0 0 0))
-(def adc-buf-idx 0)
-@const-start
-
 (defun thread-input () {
     (input-cleanup-on-pressed)
     (var input-debounce-count 3)
@@ -53,21 +48,12 @@
     (var btn-3-long-fired nil)
     (loopwhile t {
         (sleep 0.01) ; TODO: Rate limit
-        ; Median filter for v-btn
-        (setix adc-buf adc-buf-idx (v-btn))
-        (setq adc-buf-idx (mod (+ adc-buf-idx 1) 5))
-        (var button-voltage (ix (sort < adc-buf) 2))
 
-        (var new-btn-0 false)
-        (var new-btn-1 false)
-        (var new-btn-2 false)
-        (var new-btn-3 false)
-        (cond
-            ((and (> button-voltage 0.24) (< button-voltage 0.35)) (set 'new-btn-0 t))
-            ((and (> button-voltage 0.45) (< button-voltage 0.65)) (set 'new-btn-1 t))
-            ((and (> button-voltage 0.75) (< button-voltage 0.85)) (set 'new-btn-3 t))
-            ((and (> button-voltage 0.95) (< button-voltage 1.1)) (set 'new-btn-2 t))
-        )
+        ; Input from GPIO expander (Disp HW V1.3+)
+        (var new-btn-0 (read-button 0))
+        (var new-btn-1 (read-button 1))
+        (var new-btn-2 (read-button 2))
+        (var new-btn-3 (read-button 3))
 
         ; buttons are pressed on release
         (if (and (>= btn-0 input-debounce-count) (not new-btn-0) (not btn-0-long-fired))

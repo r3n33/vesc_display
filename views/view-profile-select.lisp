@@ -1,7 +1,20 @@
 @const-start
 
+(defun apply-profile-params (profile-number) {
+    (print (str-from-n profile-number "Applying profile %d"))
+    (var val-speed (read-setting (str2sym (str-from-n profile-number "pf%d-speed"))))
+    (var val-break (read-setting (str2sym (str-from-n profile-number "pf%d-break"))))
+    (var val-accel (read-setting (str2sym (str-from-n profile-number "pf%d-accel"))))
+
+    ; Send values to ESC
+    (esc-request `(conf-set 'max-speed ,val-speed))
+    (esc-request `(conf-set 'l-current-min-scale ,val-break))
+    (esc-request `(conf-set 'l-current-max-scale ,val-accel))
+})
+
 (defun view-init-profile-select () {
     (def profile-active (read-setting 'pf-active))
+    (apply-profile-params (+ profile-active 1))
 
     (var buf-title (img-buffer 'indexed4 240 30))
     (txt-block-r buf-title (list 0 1 2 3) 240 0 font18 (to-str "Select Profile"))
@@ -22,7 +35,7 @@
             (setq profile-active (- profile-active 1))
         )
         (write-setting 'pf-active profile-active)
-        ;(print profile-active)
+        (apply-profile-params (+ profile-active 1))
         (def view-animation-start (systime))
         (def view-animation-pct 0.0)
     })
@@ -33,7 +46,7 @@
             (setq profile-active (+ profile-active 1))
         )
         (write-setting 'pf-active profile-active)
-        ;(print profile-active)
+        (apply-profile-params (+ profile-active 1))
         (def view-animation-start (systime))
         (def view-animation-pct 0.0)
     })
@@ -78,11 +91,14 @@
             (str-from-n (+ profile-active 1) "%d")
         )
 
-        (draw-vertical-bar buf-profiles 20 30 40 120 '(1 3) (match profile-active
+        (var speeds-configured (list (read-setting 'pf1-speed) (read-setting 'pf2-speed) (read-setting 'pf3-speed)))
+        (var speeds-max (first (sort > speeds-configured)))
+        (var speeds-active (match profile-active
             (0i32 (read-setting 'pf1-speed))
             (1i32 (read-setting 'pf2-speed))
             (_ (read-setting 'pf3-speed))
         ))
+        (draw-vertical-bar buf-profiles 20 30 40 120 '(1 3) (map-range-01 speeds-active 0.0 speeds-max))
 
         (txt-block-c buf-profiles
             '(0 1 2 3)

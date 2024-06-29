@@ -58,12 +58,20 @@
     })
     ; Increase value
     (defun on-btn-2-pressed () {
-        (if (<= profile-edit-value 0.99)
-            (setq profile-edit-value (+ profile-edit-value 0.01)))
+        (match profile-edit-item
+            (0 (if (< profile-edit-value 53.6)
+                (setq profile-edit-value (+ profile-edit-value 0.01))))
+            (_ (if (<= profile-edit-value 0.99)
+                (setq profile-edit-value (+ profile-edit-value 0.01))))
+        )
     })
     (defun on-btn-2-repeat-press () {
-        (if (<= profile-edit-value 0.99)
-            (setq profile-edit-value (+ profile-edit-value 0.01)))
+        (match profile-edit-item
+            (0 (if (< profile-edit-value 53.6)
+                (setq profile-edit-value (+ profile-edit-value 0.01))))
+            (_ (if (<= profile-edit-value 0.99)
+                (setq profile-edit-value (+ profile-edit-value 0.01))))
+        )
     })
 
     (defun on-btn-3-pressed () {
@@ -111,7 +119,7 @@
             (if (not-eq profile-edit-item profile-edit-item-next) {
                 ; Draw saved values
                 (txt-block-l buf-profile-opt0 (list 0 1 2 3) 0 0 font24
-                    (str-merge (str-from-n (to-i (* (read-setting (str2sym (str-from-n profile-active "pf%d-speed"))) 100)) "Speed %d") "%")
+                    (str-merge (str-from-n (/ (read-setting (str2sym (str-from-n profile-active "pf%d-speed")) ms-to-kph)) "Speed %0.1f") "km")  ; TODO: Units switching
                 )
 
                 (txt-block-l buf-profile-opt1 (list 0 1 2 3) 0 0 font24
@@ -129,7 +137,7 @@
                     (0 {
                         (img-clear buf-profile-opt0)
                         (txt-block-l buf-profile-opt0 (list 0 1 2 3) 0 0 font24
-                            (str-merge (str-from-n (to-i (* profile-edit-value 100)) "Speed %d") "%")
+                            (str-merge (str-from-n profile-edit-value "Speed %0.1f") "km") ; TODO: Units switching
                         )
                     } )
                     (1 {

@@ -65,13 +65,13 @@
 
 (defun restore-settings ()
     (progn
-        (write-setting 'pf1-speed 1.0)
+        (write-setting 'pf1-speed 39.3)
         (write-setting 'pf1-break 1.0)
         (write-setting 'pf1-accel 1.0)
-        (write-setting 'pf2-speed 0.7)
+        (write-setting 'pf2-speed 18.8)
         (write-setting 'pf2-break 0.4)
         (write-setting 'pf2-accel 0.6)
-        (write-setting 'pf3-speed 0.5)
+        (write-setting 'pf3-speed 11.2)
         (write-setting 'pf3-break 0.2)
         (write-setting 'pf3-accel 0.4)
         (write-setting 'pf-active 0)

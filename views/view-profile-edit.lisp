@@ -41,31 +41,43 @@
 ; Level 1: Editing value for selected option
 (defun set-menu-edit-option () {
     (defun on-btn-0-pressed () {
+        ; Switch to option selection
         (setq view-profile-mode 'select-option)
         (set-menu-select-option)
-        ; TODO: remove highlight from selected option
+        (def profile-edit-item nil) ; Remove highlight from selected option
     })
 
-    ; TODO: decrease value
+    ; Decrease value
     (defun on-btn-1-pressed () {
-        (match profile-edit-item
-            (0 nil)
-            (1 nil)
-            (2 nil)
-        )
+        (if (> profile-edit-value 0.01)
+            (setq profile-edit-value (- profile-edit-value 0.01)))
     })
-    ; TODO: increase value
+    (defun on-btn-1-repeat-press () {
+        (if (> profile-edit-value 0.01)
+            (setq profile-edit-value (- profile-edit-value 0.01)))
+    })
+    ; Increase value
     (defun on-btn-2-pressed () {
-        (match profile-edit-item
-            (0 nil)
-            (1 nil)
-            (2 nil)
-        )
+        (if (<= profile-edit-value 0.99)
+            (setq profile-edit-value (+ profile-edit-value 0.01)))
+    })
+    (defun on-btn-2-repeat-press () {
+        (if (<= profile-edit-value 0.99)
+            (setq profile-edit-value (+ profile-edit-value 0.01)))
     })
 
     (defun on-btn-3-pressed () {
-        ; TODO: save
-        ; (write-setting 'name 'value)
+        ; Save user changes
+        (match profile-edit-item
+            (0 (write-setting (str2sym (str-from-n profile-active "pf%d-speed")) profile-edit-value))
+            (1 (write-setting (str2sym (str-from-n profile-active "pf%d-break")) profile-edit-value))
+            (2 (write-setting (str2sym (str-from-n profile-active "pf%d-accel")) profile-edit-value))
+        )
+
+        ; Switch to option selection
+        (setq view-profile-mode 'select-option)
+        (set-menu-select-option)
+        (def profile-edit-item nil) ; Remove highlight from selected option
     })
     ; Render menu
     (view-draw-menu "BACK" 'arrow-down 'arrow-up "SAVE")
@@ -89,7 +101,7 @@
     (def buf-profile-opt1 (img-buffer 'indexed4 290 30))
     (def buf-profile-opt2 (img-buffer 'indexed4 290 30))
 
-    (def view-profile-mode 'select-option)
+    (def view-profile-mode 'select-option) ; 'select-option or 'edit-option
     (set-menu-select-option)
 })
 
@@ -114,21 +126,24 @@
         (edit-option {
             (if (not-eq profile-edit-value profile-edit-value-previous) {
                 (match profile-edit-item
-                    (0
+                    (0 {
+                        (img-clear buf-profile-opt0)
                         (txt-block-l buf-profile-opt0 (list 0 1 2 3) 0 0 font24
                             (str-merge (str-from-n (to-i (* profile-edit-value 100)) "Speed %d") "%")
                         )
-                    )
-                    (1
+                    } )
+                    (1 {
+                        (img-clear buf-profile-opt1)
                         (txt-block-l buf-profile-opt1 (list 0 1 2 3) 0 0 font24
                             (str-merge (str-from-n (to-i (* profile-edit-value 100)) "Break %d") "%")
                         )
-                    )
-                    (2
+                    })
+                    (2 {
+                        (img-clear buf-profile-opt2)
                         (txt-block-l buf-profile-opt2 (list 0 1 2 3) 0 0 font24
                             (str-merge (str-from-n (to-i (* profile-edit-value 100)) "Accel %d") "%")
                         )
-                    )
+                    })
                 )
             })
         })
@@ -153,7 +168,7 @@
             (if (not-eq profile-edit-item profile-edit-item-next) {
                 ; Render
                 (disp-render buf-profile-opt0 5 35  (menu-option-color 0 profile-edit-item-next -1))
-                (disp-render buf-profile-opt1 5 95 (menu-option-color 1 profile-edit-item-next -1))
+                (disp-render buf-profile-opt1 5 95  (menu-option-color 1 profile-edit-item-next -1))
                 (disp-render buf-profile-opt2 5 155 (menu-option-color 2 profile-edit-item-next -1))
                 (setq profile-edit-item profile-edit-item-next)
             })

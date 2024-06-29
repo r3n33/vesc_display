@@ -1,17 +1,17 @@
 ; Persistent settings
 ; Format: (label . (offset type))
 (def eeprom-addrs '(
-    (ver-code    . (0 i))
-    (pf1-speed   . (1 f))
-    (pf1-current . (2 f))
-    (pf1-wattage . (3 i))
-    (pf2-speed   . (4 f))
-    (pf2-current . (5 f))
-    (pf2-wattage . (6 i))
-    (pf3-speed   . (7 f))
-    (pf3-current . (8 f))
-    (pf3-wattage . (9 i))
-    (pf-active   . (10 i))
+    (pf1-speed . (1 f))
+    (ver-code  . (0 i))
+    (pf1-break . (2 f))
+    (pf1-accel . (3 i))
+    (pf2-speed . (4 f))
+    (pf2-break . (5 f))
+    (pf2-accel . (6 i))
+    (pf3-speed . (7 f))
+    (pf3-break . (8 f))
+    (pf3-accel . (9 i))
+    (pf-active . (10 i))
 ))
 
 (defun print-settings ()
@@ -19,21 +19,21 @@
         (print (list (first it) (read-setting (first it))))
 ))
 
-(defun save-settings (  pf1-speed pf1-curent pf1-wattage
-                        pf2-speed pf2-curent pf2-wattage
-                        pf3-speed pf3-curent pf3-wattage
+(defun save-settings (  pf1-speed pf1-break pf1-accel
+                        pf2-speed pf2-break pf2-accel
+                        pf3-speed pf3-break pf3-accel
                         pf-active
 )
     (progn
         (write-setting 'pf1-speed pf1-speed)
-        (write-setting 'pf1-current pf1-curent)
-        (write-setting 'pf1-wattage pf1-wattage)
+        (write-setting 'pf1-break pf1-break)
+        (write-setting 'pf1-accel pf1-accel)
         (write-setting 'pf2-speed pf2-speed)
-        (write-setting 'pf2-current pf2-curent)
-        (write-setting 'pf2-wattage pf2-wattage)
+        (write-setting 'pf2-break pf2-break)
+        (write-setting 'pf2-accel pf2-accel)
         (write-setting 'pf3-speed pf3-speed)
-        (write-setting 'pf3-current pf3-curent)
-        (write-setting 'pf3-wattage pf3-wattage)
+        (write-setting 'pf3-break pf3-break)
+        (write-setting 'pf3-accel pf3-accel)
         (write-setting 'pf-active pf-active)
         (print "Settings Saved!")
 ))
@@ -66,14 +66,14 @@
 (defun restore-settings ()
     (progn
         (write-setting 'pf1-speed 1.0)
-        (write-setting 'pf1-current 1.0)
-        (write-setting 'pf1-wattage 500)
+        (write-setting 'pf1-break 1.0)
+        (write-setting 'pf1-accel 1.0)
         (write-setting 'pf2-speed 1.0)
-        (write-setting 'pf2-current 1.0)
-        (write-setting 'pf2-wattage 500)
+        (write-setting 'pf2-break 1.0)
+        (write-setting 'pf2-accel 1.0)
         (write-setting 'pf3-speed 1.0)
-        (write-setting 'pf3-current 1.0)
-        (write-setting 'pf3-wattage 500)
+        (write-setting 'pf3-break 1.0)
+        (write-setting 'pf3-accel 1.0)
         (write-setting 'pf-active 0)
         (write-setting 'ver-code settings-version)
         (print "Settings Restored!")

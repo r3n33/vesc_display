@@ -26,9 +26,9 @@
         (set-menu-edit-option)
 
         (def profile-edit-value (match profile-edit-item
-            (0 (read-setting (str2sym (str-from-n view-profile-index "pf%d-speed"))))
-            (1 (read-setting (str2sym (str-from-n view-profile-index "pf%d-current"))))
-            (2 (read-setting (str2sym (str-from-n view-profile-index "pf%d-wattage"))))
+            (0 (read-setting (str2sym (str-from-n profile-active "pf%d-speed"))))
+            (1 (read-setting (str2sym (str-from-n profile-active "pf%d-break"))))
+            (2 (read-setting (str2sym (str-from-n profile-active "pf%d-accel"))))
         ))
         (def profile-edit-value-previous nil)
     })
@@ -73,11 +73,11 @@
 })
 
 (defun view-init-profile-edit () {
-    (def view-profile-index (+ profile-active 1)) ; TODO: use persistent setting
+    (def profile-active (+ (read-setting 'pf-active) 1))
 
     (var buf-title (img-buffer 'indexed4 240 30))
     (txt-block-r buf-title (list 0 1 2 3) 240 0 font18
-        (str-from-n view-profile-index "Edit Profile %d")
+        (str-from-n profile-active "Edit Profile %d")
     )
     (disp-render buf-title 80 4 '(0x000000 0x4f514f 0x929491 0xfbfcfc))
 
@@ -99,15 +99,15 @@
             (if (not-eq profile-edit-item profile-edit-item-next) {
                 ; Draw saved values
                 (txt-block-l buf-profile-opt0 (list 0 1 2 3) 0 0 font24
-                    (str-merge (str-from-n (to-i (* (read-setting (str2sym (str-from-n view-profile-index "pf%d-speed"))) 100)) "Speed %d") "%")
+                    (str-merge (str-from-n (to-i (* (read-setting (str2sym (str-from-n profile-active "pf%d-speed"))) 100)) "Speed %d") "%")
                 )
 
                 (txt-block-l buf-profile-opt1 (list 0 1 2 3) 0 0 font24
-                    (str-merge (str-from-n (to-i (* (read-setting (str2sym (str-from-n view-profile-index "pf%d-current"))) 100)) "Current %d") "%")
+                    (str-merge (str-from-n (to-i (* (read-setting (str2sym (str-from-n profile-active "pf%d-break"))) 100)) "Break %d") "%")
                 )
 
                 (txt-block-l buf-profile-opt2 (list 0 1 2 3) 0 0 font24
-                    (str-from-n (read-setting (str2sym (str-from-n view-profile-index "pf%d-wattage"))) "%d Watts")
+                    (str-merge (str-from-n (to-i (* (read-setting (str2sym (str-from-n profile-active "pf%d-accel"))) 100)) "Accel %d") "%")
                 )
             })
         })
@@ -121,12 +121,12 @@
                     )
                     (1
                         (txt-block-l buf-profile-opt1 (list 0 1 2 3) 0 0 font24
-                            (str-merge (str-from-n (to-i (* profile-edit-value 100)) "Current %d") "%")
+                            (str-merge (str-from-n (to-i (* profile-edit-value 100)) "Break %d") "%")
                         )
                     )
                     (2
                         (txt-block-l buf-profile-opt2 (list 0 1 2 3) 0 0 font24
-                            (str-from-n profile-edit-value "%d Watts")
+                            (str-merge (str-from-n (to-i (* profile-edit-value 100)) "Accel %d") "%")
                         )
                     )
                 )

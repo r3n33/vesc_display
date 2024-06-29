@@ -1,8 +1,7 @@
 @const-start
 
 (defun view-init-profile-select () {
-    ; TODO: temporary until eeprom is ready
-    (def profile-active 0)
+    (def profile-active (read-setting 'pf-active))
 
     (var buf-title (img-buffer 'indexed4 240 30))
     (txt-block-r buf-title (list 0 1 2 3) 240 0 font18 (to-str "Select Profile"))
@@ -18,21 +17,23 @@
     })
 
     (defun on-btn-1-pressed () {
-        (if (eq profile-active 0)
-            (setq profile-active 2)
+        (if (eq profile-active 0i32)
+            (setq profile-active 2i32)
             (setq profile-active (- profile-active 1))
         )
-        (print profile-active)
+        (write-setting 'pf-active profile-active)
+        ;(print profile-active)
         (def view-animation-start (systime))
         (def view-animation-pct 0.0)
     })
 
     (defun on-btn-2-pressed () {
-        (if (eq profile-active 2)
-            (setq profile-active 0)
+        (if (eq profile-active 2i32)
+            (setq profile-active 0i32)
             (setq profile-active (+ profile-active 1))
         )
-        (print profile-active)
+        (write-setting 'pf-active profile-active)
+        ;(print profile-active)
         (def view-animation-start (systime))
         (def view-animation-pct 0.0)
     })
@@ -56,54 +57,68 @@
             (def view-animation-pct (/ (secs-since view-animation-start) animation-seconds))
         })
 
-        (var posb (rot-point-origin 70 0 0))
-        (var posa (rot-point-origin 70 0 90))
-        (var posc (rot-point-origin 70 0 180))
-
-        (var active-box-size '(120 90))
-        (var inactive-box-size '(80 60))
-
+        ; Background
+        (var box-size '(240 180))
         (img-rectangle buf-profiles
-            (+ (- (ix posa 0) (/ (first active-box-size) 2)) 120)
-            (+ (ix posa 1) 10)
-            (first active-box-size)
-            (second active-box-size)
+            0
+            0
+            (first box-size)
+            (second box-size)
             3
-            '(filled)
+            '(thickness 2)
             '(rounded 10)
         )
 
+        ; Profile Number
         (txt-block-c buf-profiles
             '(0 1 2 3)
-            (+ (ix posa 0) 120)
-            (+ (ix posa 1) 40)
+            120
+            5
             font24
             (str-from-n (+ profile-active 1) "%d")
         )
 
-        (img-rectangle buf-profiles
-            (+ (- (ix posb 0) (/ (first inactive-box-size) 2)) 120)
-            (+ (ix posb 1) 10)
-            (first inactive-box-size)
-            (second inactive-box-size)
-            2
-            '(filled)
-            '(rounded 2)
+        (draw-vertical-bar buf-profiles 20 30 40 120 '(1 3) (match profile-active
+            (0i32 (read-setting 'pf1-speed))
+            (1i32 (read-setting 'pf2-speed))
+            (_ (read-setting 'pf3-speed))
+        ))
+
+        (txt-block-c buf-profiles
+            '(0 1 2 3)
+            40
+            160
+            font15
+            (to-str "Speed")
         )
 
-        (img-rectangle buf-profiles
-            (+ (- (ix posc 0) (/ (first inactive-box-size) 2)) 120)
-            (+ (ix posc 1) 10)
-            (first inactive-box-size)
-            (second inactive-box-size)
-            2
-            '(filled)
-            '(rounded 2)
+        (draw-vertical-bar buf-profiles 100 30 40 120 '(1 3) (match profile-active
+            (0i32 (read-setting 'pf1-break))
+            (1i32 (read-setting 'pf2-break))
+            (_ (read-setting 'pf3-break))
+        ))
+
+        (txt-block-c buf-profiles
+            '(0 1 2 3)
+            120
+            160
+            font15
+            (to-str "Break")
         )
 
-        ;(img-circle buf-profiles (+ (ix posa 0) 140) (+ (ix posa 1) 20) 8 (if (eq profile-active 0) 3 0) '(filled))
-        ;(img-circle buf-profiles (+ (ix posb 0) 140) (+ (ix posb 1) 20) 8 (if (eq profile-active 1) 3 0) '(filled))
-        ;(img-circle buf-profiles (+ (ix posc 0) 140) (+ (ix posc 1) 20) 8 (if (eq profile-active 2) 3 0) '(filled))
+        (draw-vertical-bar buf-profiles 180 30 40 120 '(1 3) (match profile-active
+            (0i32 (read-setting 'pf1-accel))
+            (1i32 (read-setting 'pf2-accel))
+            (_ (read-setting 'pf3-accel))
+        ))
+
+        (txt-block-c buf-profiles
+            '(0 1 2 3)
+            200
+            160
+            font15
+            (to-str "Accel")
+        )
     })
 })
 

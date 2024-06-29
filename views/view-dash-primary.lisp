@@ -25,6 +25,9 @@
     (def buf-units (img-buffer 'indexed4 50 15))
 
     (view-init-menu)
+    (defun on-btn-0-long-pressed () {
+        (hw-sleep)
+    })
     (defun on-btn-2-pressed () {
         (setting-units-cycle)
         (setix view-previous-stats 0 'stats-kmh) ; Re-draw units
@@ -42,7 +45,7 @@
 
     (def view-previous-stats (list 'stats-kmh 'stats-battery-soc 'stats-temp-battery 'stats-temp-esc 'stats-temp-motor 'stats-angle-pitch))
 
-    (view-draw-menu nil nil "UNITS" 'arrow-right)
+    (view-draw-menu "PWR" nil "UNITS" 'arrow-right)
     (view-render-menu)
     (disp-render buf-stripe-bg 5 68
         '(

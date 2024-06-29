@@ -29,6 +29,11 @@
     (def on-btn-1-long-pressed nil)
     (def on-btn-2-long-pressed nil)
     (def on-btn-3-long-pressed nil)
+
+    (def on-btn-0-repeat-press nil)
+    (def on-btn-1-repeat-press nil)
+    (def on-btn-2-repeat-press nil)
+    (def on-btn-3-repeat-press nil)
 })
 
 (defun thread-input () {
@@ -84,9 +89,23 @@
         (if (= btn-2 1) (setq btn-2-start (systime)))
         (if (= btn-3 1) (setq btn-3-start (systime)))
 
+        ; repeat presses fire until release
+        (if (and (>= btn-0 input-debounce-count) (>= (secs-since btn-0-start) 0.25)) {
+            (maybe-call (on-btn-0-repeat-press))
+        })
+        (if (and (>= btn-1 input-debounce-count) (>= (secs-since btn-1-start) 0.25)) {
+            (maybe-call (on-btn-1-repeat-press))
+        })
+        (if (and (>= btn-2 input-debounce-count) (>= (secs-since btn-2-start) 0.25)) {
+            (maybe-call (on-btn-2-repeat-press))
+        })
+        (if (and (>= btn-3 input-debounce-count) (>= (secs-since btn-3-start) 0.25)) {
+            (maybe-call (on-btn-3-repeat-press))
+        })
+
         ; long presses fire as soon as possible and not on release
-        (if (and (>= btn-0 input-debounce-count) (>= (secs-since btn-0-start) 0.25) (not btn-0-long-fired)) {
-            ;TODO: Commenting for key repeat (setq btn-0-long-fired true)
+        (if (and (>= btn-0 input-debounce-count) (>= (secs-since btn-0-start) 2.0) (not btn-0-long-fired)) {
+            (setq btn-0-long-fired true)
             (maybe-call (on-btn-0-long-pressed))
         })
         (if (and (>= btn-1 input-debounce-count) (>= (secs-since btn-1-start) 2.0) (not btn-1-long-fired)) {
@@ -97,8 +116,8 @@
             (setq btn-2-long-fired true)
             (maybe-call (on-btn-2-long-pressed))
         })
-        (if (and (>= btn-3 input-debounce-count) (>= (secs-since btn-3-start) 0.25) (not btn-3-long-fired)) {
-            ;TODO: Commenting for key repeat (setq btn-3-long-fired true)
+        (if (and (>= btn-3 input-debounce-count) (>= (secs-since btn-3-start) 2.0) (not btn-3-long-fired)) {
+            (setq btn-3-long-fired true)
             (maybe-call (on-btn-3-long-pressed))
         })
 

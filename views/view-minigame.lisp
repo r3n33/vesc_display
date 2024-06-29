@@ -30,7 +30,7 @@
     (defun on-btn-0-pressed () {
         (if (> (- paddle-x 3) 0) (setq paddle-x (- paddle-x 3)))
     })
-    (defun on-btn-0-long-pressed () {
+    (defun on-btn-0-repeat-press () {
         (if (> paddle-x 0) (setq paddle-x (- paddle-x 1)))
     })
 
@@ -54,7 +54,7 @@
     (defun on-btn-3-pressed () {
         (if (< (+ paddle-x paddle-width 3) 320) (setq paddle-x (+ paddle-x 3)))
     })
-    (defun on-btn-3-long-pressed () {
+    (defun on-btn-3-repeat-press () {
         (if (< (+ paddle-x paddle-width) 320) (setq paddle-x (+ paddle-x 1)))
     })
 

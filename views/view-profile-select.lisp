@@ -60,14 +60,14 @@
         (img-clear buf-profiles)
 
         ; Background
-        (var box-size '(240 180))
+        (var box-size '(239 179))
         (img-rectangle buf-profiles
             0
             0
             (first box-size)
             (second box-size)
             3
-            '(thickness 2)
+            '(thickness 0)
             '(rounded 10)
         )
 

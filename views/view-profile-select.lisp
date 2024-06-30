@@ -1,15 +1,26 @@
 @const-start
 
 (defun apply-profile-params (profile-number) {
+    (var apply-success true)
     (print (str-from-n profile-number "Applying profile %d"))
     (var val-speed (read-setting (str2sym (str-from-n profile-number "pf%d-speed"))))
     (var val-break (read-setting (str2sym (str-from-n profile-number "pf%d-break"))))
     (var val-accel (read-setting (str2sym (str-from-n profile-number "pf%d-accel"))))
 
     ; Send values to ESC
-    (esc-request `(conf-set 'max-speed ,val-speed))
-    (esc-request `(conf-set 'l-current-min-scale ,val-break))
-    (esc-request `(conf-set 'l-current-max-scale ,val-accel))
+    (if (not (esc-request `(conf-set 'max-speed ,val-speed))) (setq apply-success nil))
+    (if (not (esc-request `(conf-set 'l-current-min-scale ,val-break))) (setq apply-success nil))
+    (if (not (esc-request `(conf-set 'l-current-max-scale ,val-accel))) (setq apply-success nil))
+
+    (var buf-result (img-buffer 'indexed4 100 25))
+    (txt-block-l buf-result
+        '(0 1 2 3)
+        0
+        0
+        font15
+        (if apply-success (to-str "Set") (to-str "Not Set"))
+    )
+    (disp-render buf-result 5 4 '(0x000000 0x1f211f 0x4f514f 0x929491))
 })
 
 (defun view-init-profile-select () {
@@ -78,7 +89,7 @@
             (1i32 (read-setting 'pf2-speed))
             (_ (read-setting 'pf3-speed))
         ))
-        (draw-vertical-bar buf-profiles 20 15 40 120 '(1 3) (map-range-01 speeds-active 0.0 speeds-max))
+        (draw-vertical-bar buf-profiles 20 15 42 120 '(1 3) (map-range-01 speeds-active 0.0 speeds-max))
 
         (txt-block-l buf-profiles
             '(0 1 2 3)
@@ -88,7 +99,19 @@
             (to-str "Speed")
         )
 
-        (draw-vertical-bar buf-profiles 100 15 40 120 '(1 3) (match profile-active
+        ; Draw speed in bar
+        (txt-block-c buf-profiles
+            '(3 2 1 0)
+            41
+            119
+            font15
+            (match (car settings-units-speeds)
+                    (kmh (str-from-n speeds-active "%0.0f"))
+                    (mph (str-from-n (* speeds-active km-to-mi) "%0.0f"))
+                )
+        )
+
+        (draw-vertical-bar buf-profiles 98 15 42 120 '(1 3) (match profile-active
             (0i32 (read-setting 'pf1-break))
             (1i32 (read-setting 'pf2-break))
             (_ (read-setting 'pf3-break))
@@ -102,7 +125,7 @@
             (to-str "Break")
         )
 
-        (draw-vertical-bar buf-profiles 180 15 40 120 '(1 3) (match profile-active
+        (draw-vertical-bar buf-profiles 176 15 42 120 '(1 3) (match profile-active
             (0i32 (read-setting 'pf1-accel))
             (1i32 (read-setting 'pf2-accel))
             (_ (read-setting 'pf3-accel))

@@ -141,7 +141,7 @@
     ; Fill
     (def fill-h (* (- h 2) pct))
     (if (< fill-h 1) (setq fill-h 1))
-    (img-rectangle img (+ x 3) (+ y (- h fill-h)) (- w 3) fill-h (second colors) '(filled))
+    (img-rectangle img (+ x 3) (+ y (- h fill-h)) (- w 5) fill-h (second colors) '(filled))
 })
 
 (defun draw-units (img x y color font) {

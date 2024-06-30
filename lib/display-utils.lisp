@@ -56,8 +56,6 @@
 
         (disp-clear)
 
-        (gc) ; TODO: Occasionally reaching out_of_memory error when swthcing views, does this help?
-
         (def state-view-previous state-view)
         (def state-view state-view-next)
         (def state-view-next nil)

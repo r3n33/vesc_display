@@ -16,14 +16,10 @@
     (def profile-active (read-setting 'pf-active))
     (apply-profile-params (+ profile-active 1))
 
-    (var buf-title (img-buffer 'indexed4 240 30))
-    (txt-block-r buf-title (list 0 1 2 3) 240 0 font18 (to-str "Select Profile"))
-    (disp-render buf-title 80 4 '(0x000000 0x4f514f 0x929491 0xfbfcfc))
-
+    (def buf-profiles (img-buffer 'indexed4 240 180))
+    (def buf-title (img-buffer 'indexed4 150 25))
 
     (def profile-previous nil) ; Track last selection
-    (def buf-profiles (img-buffer 'indexed4 240 180))
-    (def view-animation-pct 1.0)
 
     (defun on-btn-0-pressed () {
         (def state-view-next (previous-view))
@@ -36,8 +32,6 @@
         )
         (write-setting 'pf-active profile-active)
         (apply-profile-params (+ profile-active 1))
-        (def view-animation-start (systime))
-        (def view-animation-pct 0.0)
     })
 
     (defun on-btn-2-pressed () {
@@ -47,8 +41,6 @@
         )
         (write-setting 'pf-active profile-active)
         (apply-profile-params (+ profile-active 1))
-        (def view-animation-start (systime))
-        (def view-animation-pct 0.0)
     })
 
     (defun on-btn-3-pressed () {
@@ -62,13 +54,10 @@
 
 (defun view-draw-profile-select () {
     (if (not-eq profile-active profile-previous) {
-        ;(print "draw profile")
-        (img-clear buf-profiles)
+        (img-clear buf-title)
+        (txt-block-r buf-title (list 0 1 2 3) (first (img-dims buf-title)) 0 font18 (str-from-n (+ profile-active 1) "Profile %d"))
 
-        (if (< view-animation-pct 1.0) {
-            (var animation-seconds 0.5)
-            (def view-animation-pct (/ (secs-since view-animation-start) animation-seconds))
-        })
+        (img-clear buf-profiles)
 
         ; Background
         (var box-size '(240 180))
@@ -82,15 +71,6 @@
             '(rounded 10)
         )
 
-        ; Profile Number
-        (txt-block-c buf-profiles
-            '(0 1 2 3)
-            120
-            5
-            font24
-            (str-from-n (+ profile-active 1) "%d")
-        )
-
         (var speeds-configured (list (read-setting 'pf1-speed) (read-setting 'pf2-speed) (read-setting 'pf3-speed)))
         (var speeds-max (first (sort > speeds-configured)))
         (var speeds-active (match profile-active
@@ -98,17 +78,17 @@
             (1i32 (read-setting 'pf2-speed))
             (_ (read-setting 'pf3-speed))
         ))
-        (draw-vertical-bar buf-profiles 20 30 40 120 '(1 3) (map-range-01 speeds-active 0.0 speeds-max))
+        (draw-vertical-bar buf-profiles 20 15 40 120 '(1 3) (map-range-01 speeds-active 0.0 speeds-max))
 
-        (txt-block-c buf-profiles
+        (txt-block-l buf-profiles
             '(0 1 2 3)
-            40
-            160
+            10
+            150
             font15
             (to-str "Speed")
         )
 
-        (draw-vertical-bar buf-profiles 100 30 40 120 '(1 3) (match profile-active
+        (draw-vertical-bar buf-profiles 100 15 40 120 '(1 3) (match profile-active
             (0i32 (read-setting 'pf1-break))
             (1i32 (read-setting 'pf2-break))
             (_ (read-setting 'pf3-break))
@@ -116,22 +96,22 @@
 
         (txt-block-c buf-profiles
             '(0 1 2 3)
-            120
-            160
+            (/ (first (img-dims buf-profiles)) 2)
+            150
             font15
             (to-str "Break")
         )
 
-        (draw-vertical-bar buf-profiles 180 30 40 120 '(1 3) (match profile-active
+        (draw-vertical-bar buf-profiles 180 15 40 120 '(1 3) (match profile-active
             (0i32 (read-setting 'pf1-accel))
             (1i32 (read-setting 'pf2-accel))
             (_ (read-setting 'pf3-accel))
         ))
 
-        (txt-block-c buf-profiles
+        (txt-block-r buf-profiles
             '(0 1 2 3)
-            200
-            160
+            (- (first (img-dims buf-profiles)) 10)
+            150
             font15
             (to-str "Accel")
         )
@@ -140,16 +120,15 @@
 
 (defun view-render-profile-select () {
     (if (not-eq profile-active profile-previous) {
-        ;(print "render profile")
+        (disp-render buf-title (- 310 (first (img-dims buf-title))) 4 '(0x000000 0x4f514f 0x929491 0xfbfcfc))
 
-        (disp-render buf-profiles 40 30 '(0x000000 0x4f514f 0x929491 0xfbfcfc))
+        (disp-render buf-profiles (- 160 (/ (first (img-dims buf-profiles)) 2)) 30 '(0x000000 0x4f514f 0x929491 0xfbfcfc))
 
-        (if (>= view-animation-pct 1.0)
-            (setq profile-previous profile-active)
-        )
+        (setq profile-previous profile-active)
     })
 })
 
 (defun view-cleanup-profile-select () {
+    (def buf-title nil)
     (def buf-profiles nil)
 })

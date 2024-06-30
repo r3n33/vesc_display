@@ -49,18 +49,26 @@
 
     ; Decrease value
     (defun on-btn-1-pressed () {
-        (if (> profile-edit-value 0.01)
-            (setq profile-edit-value (- profile-edit-value 0.01)))
+        (match profile-edit-item
+            (0 (if (> profile-edit-value 0.1)
+                (setq profile-edit-value (- profile-edit-value 0.1))))
+            (_ (if (> profile-edit-value 0.01)
+                (setq profile-edit-value (- profile-edit-value 0.01))))
+        )
     })
     (defun on-btn-1-repeat-press () {
-        (if (> profile-edit-value 0.01)
-            (setq profile-edit-value (- profile-edit-value 0.01)))
+        (match profile-edit-item
+            (0 (if (> profile-edit-value 0.1)
+                (setq profile-edit-value (- profile-edit-value 0.1))))
+            (_ (if (> profile-edit-value 0.01)
+                (setq profile-edit-value (- profile-edit-value 0.01))))
+        )
     })
     ; Increase value
     (defun on-btn-2-pressed () {
         (match profile-edit-item
             (0 (if (< profile-edit-value 53.6)
-                (setq profile-edit-value (+ profile-edit-value 0.01))))
+                (setq profile-edit-value (+ profile-edit-value 0.1))))
             (_ (if (<= profile-edit-value 0.99)
                 (setq profile-edit-value (+ profile-edit-value 0.01))))
         )
@@ -68,7 +76,7 @@
     (defun on-btn-2-repeat-press () {
         (match profile-edit-item
             (0 (if (< profile-edit-value 53.6)
-                (setq profile-edit-value (+ profile-edit-value 0.01))))
+                (setq profile-edit-value (+ profile-edit-value 0.1))))
             (_ (if (<= profile-edit-value 0.99)
                 (setq profile-edit-value (+ profile-edit-value 0.01))))
         )
@@ -95,19 +103,20 @@
 (defun view-init-profile-edit () {
     (def profile-active (+ (read-setting 'pf-active) 1))
 
-    (var buf-title (img-buffer 'indexed4 240 30))
-    (txt-block-r buf-title (list 0 1 2 3) 240 0 font18
+    (def buf-profile-opt0 (img-buffer 'indexed4 290 35))
+    (def buf-profile-opt1 (img-buffer 'indexed4 220 35))
+    (def buf-profile-opt2 (img-buffer 'indexed4 220 35))
+
+    (var buf-title (img-buffer 'indexed4 220 25))
+    (txt-block-r buf-title (list 0 1 2 3) 220 0 font18
         (str-from-n profile-active "Edit Profile %d")
     )
-    (disp-render buf-title 80 4 '(0x000000 0x4f514f 0x929491 0xfbfcfc))
+    (disp-render buf-title (- 310 (first (img-dims buf-title))) 4 '(0x000000 0x4f514f 0x929491 0xfbfcfc))
 
     (def profile-edit-item nil)
     (def profile-edit-item-next 0)
     (def profile-edit-value nil)
     (def profile-edit-value-previous nil)
-    (def buf-profile-opt0 (img-buffer 'indexed4 290 30))
-    (def buf-profile-opt1 (img-buffer 'indexed4 290 30))
-    (def buf-profile-opt2 (img-buffer 'indexed4 290 30))
 
     (def view-profile-mode 'select-option) ; 'select-option or 'edit-option
     (set-menu-select-option)

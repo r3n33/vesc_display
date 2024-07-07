@@ -10,20 +10,6 @@
     } ret )
 })
 
-(defun proc-data (src des data rssi) {
-    ; Ignore broadcast, only handle data sent directly to us
-    (if (not-eq des broadcast-addr) {
-        (def peer-addr src)
-        ;(esp-now-add-peer src)
-        ;(eval (read data))
-    } {
-        ; Broadcast data
-        ;(var br-data (unflatten data))
-    })
-
-    (free data)
-})
-
 
 (defun proc-sid (id data) {
     (if (= id 20) {
@@ -64,16 +50,15 @@
     (free data)
 })
 
-
 (defun event-handler ()
     (loopwhile t
         (recv
-            ;;((event-esp-now-rx (? src) (? des) (? data) (? rssi)) (proc-data src des data rssi))
+            ((event-esp-now-rx (? src) (? des) (? data) (? rssi)) (proc-data src des data rssi))
             ((event-can-sid . ((? id) . (? data))) (proc-sid id data))
             (_ nil)
 )))
 
 
 (event-register-handler (spawn event-handler))
-;;(event-enable 'event-esp-now-rx)
+;(event-enable 'event-esp-now-rx)
 (event-enable 'event-can-sid)

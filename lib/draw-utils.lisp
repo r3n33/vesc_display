@@ -216,6 +216,27 @@
     (img-line img x1 y1 x3 y3 color '(thickness 1))
 })
 
+(defun draw-turn-animation (img left-right pct) {
+    (var dots 9)
+    (var dot-spacing 2)
+    (var dot-w 5)
+    (var dot-h 17)
+    (var dots-illuminated (to-i (* dots pct)))
+    (looprange i 0 dots {
+        (img-rectangle img
+            (* i (+ dot-w dot-spacing))
+            0
+            dot-w
+            dot-h
+            (if (eq left-right 'left)
+                (if (< (- 7 i) dots-illuminated) 3 2) ; TODO: improve readability/logic
+                (if (< (- i 1) dots-illuminated) 3 2) ; TODO: improve readability/logic
+            )
+            '(filled)
+            '(rounded 2))
+    })
+})
+
 ; img = image buffer
 ; cx = X center position
 ; cy = Y center position

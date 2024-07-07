@@ -33,8 +33,13 @@
 (import "assets/warning-4c.bin" 'icon-warning)
 (import "assets/bike-6c.bin" 'icon-bike)
 
-(import "lib/colors.lisp" 'code-colors)
-(read-eval-program code-colors)
+; Homologation Elements
+(import "assets/blinker-left-4c.bin" 'icon-blinker-left)
+(import "assets/blinker-right-4c.bin" 'icon-blinker-right)
+(import "assets/cruise-control-4c.bin" 'icon-cruise-control)
+(import "assets/light-4c.bin" 'icon-lights)
+(import "assets/high-beam-4c.bin" 'icon-highbeam)
+(import "assets/kickstand-4c.bin" 'icon-kickstand)
 
 (import "lib/user-settings.lisp" 'code-user-settings)
 (read-eval-program code-user-settings)
@@ -51,8 +56,8 @@
 (import "views/components/view-menu.lisp" 'code-view-menu)
 (read-eval-program code-view-menu)
 
-(import "views/view-main.lisp" 'code-view-main)
-(read-eval-program code-view-main)
+(import "views/view-homologation.lisp" 'code-view-homologation)
+(read-eval-program code-view-homologation)
 
 (import "views/view-speed-large.lisp" 'code-view-speed-large)
 (read-eval-program code-view-speed-large)

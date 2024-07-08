@@ -23,7 +23,7 @@
     (def buf-highbeam (img-buffer-from-bin icon-highbeam))
     (def buf-kickstand (img-buffer-from-bin icon-kickstand))
 
-    (var colors-red-icon '(0x000000 0x570001 0xa70001 0xfd0303))
+    (var colors-red-icon '(0x000000 0x570001 0xa70001 0xff0303))
     (var colors-green-icon '(0x000000 0x005400 0x00b800 0x00ff00))
     (var colors-blue-icon '(0x000000 0x020040 0x000077 0x1d00e8))
     (var colors-dim-icon '(0x000000 0x090909 0x101010 0x171717))
@@ -40,8 +40,8 @@
     (def test-blink-anim-duration 0.75)
     (def buf-blink-anim (img-buffer 'indexed4 62 18))
     (var colors-anim '(0x000000 0x000000 0x171717 0x00ff00))
-    (draw-turn-animation buf-blink-anim 'left (clamp01 (/ (secs-since test-blink-anim-time) test-blink-anim-duration)))
-    (disp-render buf-blink-anim 38 11 colors-anim) ; Left side
+    ;(draw-turn-animation buf-blink-anim 'left (clamp01 (/ (secs-since test-blink-anim-time) test-blink-anim-duration)))
+    ;(disp-render buf-blink-anim 38 11 colors-anim) ; Left side
 
     (view-init-menu)
     (defun on-btn-0-long-pressed () {
@@ -124,10 +124,18 @@
     (var colors-dim-icon '(0x000000 0x090909 0x101010 0x171717))
     (var colors-anim '(0x000000 0x000000 0x171717 0x00ff00))
     (var anim-pct (clamp01 (/ (secs-since test-blink-anim-time) test-blink-anim-duration)))
-    (draw-turn-animation buf-blink-anim 'left anim-pct)
+    (if test-blink-on
+        (draw-turn-animation buf-blink-anim 'left anim-pct 'off-cyle)
+        (draw-turn-animation buf-blink-anim 'left anim-pct 'on-cycle)
+    )
+
     (disp-render buf-blink-anim 38 11 colors-anim) ; Left side
 
-    (draw-turn-animation buf-blink-anim 'right anim-pct)
+    (if test-blink-on
+        (draw-turn-animation buf-blink-anim 'right anim-pct 'on-cycle)
+        (draw-turn-animation buf-blink-anim 'right anim-pct 'off-cycle)
+    )
+
     (disp-render buf-blink-anim 218 11 colors-anim) ; Right side
 
     (if (eq anim-pct 1.0) {

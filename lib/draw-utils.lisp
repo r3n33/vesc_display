@@ -75,6 +75,13 @@
     })
 })
 
+(defun txt-block-v (img col w h font txt) {
+    (var buf-temp (img-buffer 'indexed4 h w)) ; Create rotated buffer for img-blit
+    (txt-block-l buf-temp col 0 0 font txt)
+
+    (img-blit img buf-temp w 0 -1 '(rotate 0 0 -90))
+})
+
 (defun draw-battery-soc (img w h soc line-w) {
     (if (< soc 0.0) (setq soc 0.0))
     (if (> soc 1.0) (setq soc 1.0))

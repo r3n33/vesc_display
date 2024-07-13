@@ -75,23 +75,27 @@
     })
 })
 
-(defun draw-battery-soc (img w h soc) {
+(defun draw-battery-soc (img w h soc line-w) {
     (if (< soc 0.0) (setq soc 0.0))
     (if (> soc 1.0) (setq soc 1.0))
 
-    ;(img-rectangle img x y width height color opt-attr1
-
-    (var bat-left 4)
-    (var bat-top 4)
+    (var nub-bottom (- h (* h 0.93)))
+    (var nub-indent (/ w 6))
     ; Outline
-    (img-rectangle img bat-left (+ bat-top 5) (- w 8) (- h 16) 1 '(thickness 3)) ; TODO: thickness 2 is coming out 1 with rounded
+    (img-rectangle img 0 nub-bottom (- w line-w) (- h nub-bottom line-w) 1 `(thickness ,line-w))
     ; Nub
-    (img-rectangle img (+ bat-left 3) bat-top (- w 16) 7 1 '(thickness 2))
+    (img-rectangle img nub-indent 0 (- w (* nub-indent 2)) nub-bottom 1 `(thickness ,line-w))
 
     ; Fill
-    (def fill-h (* (- h 16 bat-top 2) soc))
+    (var fill-h (* (- h nub-bottom line-w) soc))
     (if (< fill-h 1) (setq fill-h 1))
-    (img-rectangle img 7 (+ (+ bat-top 5 2) (- h fill-h bat-top 16)) (- w 8 5) fill-h 2 '(filled))
+    (img-rectangle
+        img
+        line-w
+        (+ (+ nub-bottom (* line-w 2)) (- h fill-h nub-bottom))
+        (- w (* line-w 2)) 
+        fill-h
+        2 '(filled))
 })
 
 (defun draw-vertical-bar (img x y w h colors pct) {

@@ -1,9 +1,9 @@
-@const-start
-
 ; TODO: Relocate to a better home
 (def indicate-l-on nil)
 (def indicate-r-on nil)
 (def indicate-ms 0)
+
+@const-start
 
 (defun view-init-homologation  () {
     (def buf-stripe-bg (img-buffer-from-bin icon-stripe))
@@ -15,8 +15,10 @@
 
     (def buf-warning-icon (img-buffer-from-bin icon-warning))
 
-    (def buf-battery (img-buffer 'indexed4 42 120))
-    (def buf-battery-soc (img-buffer 'indexed4 50 20))
+    (def buf-battery-a-sm (img-buffer 'indexed4 20 62))
+    (def buf-battery-b-sm (img-buffer 'indexed4 20 62))
+    (def buf-battery-a-sm-soc (img-buffer 'indexed4 20 50))
+    (def buf-battery-b-sm-soc (img-buffer 'indexed4 20 50))
     
     (def buf-speed (img-buffer 'indexed4 179 90))
     (def buf-units (img-buffer 'indexed4 50 15))
@@ -39,6 +41,7 @@
     (disp-render buf-lights 165 1 colors-green-icon)
     (disp-render buf-highbeam 104 1 colors-blue-icon)
     (disp-render buf-kickstand 265 116 colors-red-icon)
+    (disp-render buf-warning-icon 190 50 colors-dim-icon)
 
     ; Buffer used for L and R Indicator Animations
     (def buf-indicate-anim (img-buffer 'indexed4 62 18))
@@ -111,13 +114,18 @@
     })
     (if (not-eq (to-i (* 100 stats-battery-soc)) (second view-previous-stats)) {
         ; Update Battery %
-        (img-clear buf-battery)
+        (img-clear buf-battery-a-sm)
         (var displayed-soc (* 100 stats-battery-soc))
         (if (< displayed-soc 0) (setq displayed-soc 0))
-        (draw-battery-soc buf-battery 38 (second (img-dims buf-battery)) stats-battery-soc)
+        (draw-battery-soc buf-battery-a-sm (first (img-dims buf-battery-a-sm)) (second (img-dims buf-battery-a-sm)) stats-battery-soc 1)
 
-        (img-clear buf-battery-soc)
-        (txt-block-c buf-battery-soc (list 0 1 2 3) (/ (first (img-dims buf-battery-soc)) 2) 0 font15 (str-merge (str-from-n displayed-soc "%0.0f") "%"))
+        (img-clear buf-battery-a-sm-soc)
+        (txt-block-c buf-battery-a-sm-soc (list 0 1 2 3) (/ (first (img-dims buf-battery-a-sm-soc)) 2) 0 font15 (str-merge (str-from-n displayed-soc "%0.0f") "%"))
+
+        ; TODO: Testing Battery B
+        (draw-battery-soc buf-battery-b-sm (first (img-dims buf-battery-b-sm)) (second (img-dims buf-battery-b-sm)) (- 1.0 stats-battery-soc) 1)
+        (img-clear buf-battery-b-sm-soc)
+        (txt-block-c buf-battery-b-sm-soc (list 0 1 2 3) (/ (first (img-dims buf-battery-b-sm-soc)) 2) 0 font15 (str-merge (str-from-n displayed-soc "%0.0f") "%"))
     })
 
     ; TODO: Indicator testing
@@ -173,14 +181,18 @@
             (setq color (lerp-color 0xe72a62 0xffa500 (ease-in-out-quint (* stats-battery-soc 2))))
             (setq color (lerp-color 0xffa500 0x7f9a0d (ease-in-out-quint (* (- stats-battery-soc 0.5) 2))))
         )
-        ;(disp-render buf-battery 265 120 `(0x000000 0xfbfcfc ,color 0x0000ff))
-        ;(disp-render buf-battery-soc 261 100 colors-text-aa)
+        (disp-render buf-battery-a-sm 262 92 `(0x000000 0xfbfcfc ,color 0x0000ff))
+        (disp-render buf-battery-a-sm-soc 262 40 colors-text-aa)
+
+        ; TODO: Testing Battery B
+        (disp-render buf-battery-b-sm 288 92 `(0x000000 0xfbfcfc ,color 0x0000ff))
+        (disp-render buf-battery-b-sm-soc 288 40 colors-text-aa)
     })
 
     (def view-previous-stats (list stats-kmh (to-i (* 100 stats-battery-soc))))
 
     (if (> (length stats-fault-codes-observed) 0) {
-        (disp-render buf-warning-icon 206 71 '(0x000000 0xff0000 0x929491 0xfbfcfc))
+        (disp-render buf-warning-icon 190 50 '(0x000000 0xff0000 0x929491 0xfbfcfc))
     })
 })
 
@@ -193,7 +205,11 @@
     
     (def buf-warning-icon nil)
 
-    (def buf-battery nil)
+    (def buf-battery-a-sm nil)
+    (def buf-battery-a-sm-soc nil)
+
+    (def buf-battery-b-sm nil)
+    (def buf-battery-b-sm-soc nil)
 
     (def buf-speed nil)
     (def buf-units nil)

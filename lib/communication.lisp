@@ -66,8 +66,24 @@
         (def indicate-r-on (eq (bufget-u8 data 1) 1))
         (def indicate-ms (bufget-u16 data 2))
 
+        (def highbeam-on (eq (bufget-u8 data 4) 1))
+
         ; Track when message was received
         (def indicator-timestamp (systime))
+    })
+
+    (if (= id 31) {
+        (def kickstand-down (eq (bufget-u8 data 0) 0)) ; NOTE: Inverted
+        (def drive-mode-active (eq (bufget-u8 data 1) 1))
+        (def performance-mode (match (bufget-u8 data 2)
+            (0 'eco)
+            (1 'normal)
+            (2 'sport)
+            (_ {
+                (print "Error: Invalid performance mode")
+                'eco
+            })
+        ))
     })
 
     (free data)

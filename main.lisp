@@ -40,6 +40,14 @@
 (import "assets/light-4c.bin" 'icon-lights)
 (import "assets/high-beam-4c.bin" 'icon-highbeam)
 (import "assets/kickstand-4c.bin" 'icon-kickstand)
+(import "assets/neutral-4c.bin" 'icon-neutral)
+(import "assets/drive-4c.bin" 'icon-drive)
+
+(import "lib/vehicle-state.lisp" 'code-vehicle-state)
+(read-eval-program code-vehicle-state)
+
+(import "lib/colors.lisp" 'code-colors)
+(read-eval-program code-colors)
 
 (import "lib/user-settings.lisp" 'code-user-settings)
 (read-eval-program code-user-settings)

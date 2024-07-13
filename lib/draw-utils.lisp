@@ -216,7 +216,7 @@
     (img-line img x1 y1 x3 y3 color '(thickness 1))
 })
 
-(defun draw-turn-animation (img left-right pct cycle) {
+(defun draw-turn-animation (img left-right pct) {
     (var dots 9)
     (var dot-spacing 2)
     (var dot-w 5)
@@ -229,14 +229,8 @@
             dot-w
             dot-h
             (if (eq left-right 'left)
-                (if (< (- 7 i) dots-illuminated)
-                    (if (eq cycle 'on-cycle) 3 2)
-                    (if (eq cycle 'on-cycle) 2 3)
-                ) ; TODO: improve readability/logic
-                (if (< (- i 1) dots-illuminated)
-                    (if (eq cycle 'on-cycle) 2 3)
-                    (if (eq cycle 'on-cycle) 3 2)
-                ) ; TODO: improve readability/logic
+                (if (< (- 7 i) dots-illuminated) 2 3) ; TODO: improve readability/logic
+                (if (< (- i 1) dots-illuminated) 2 3) ; TODO: improve readability/logic
             )
             '(filled)
             '(rounded 2))

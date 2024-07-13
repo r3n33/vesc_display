@@ -61,6 +61,15 @@
         (setq rx-cnt-can (+ rx-cnt-can 1))
     })
 
+    (if (= id 30) {
+        (def indicate-l-on (eq (bufget-u8 data 0) 1))
+        (def indicate-r-on (eq (bufget-u8 data 1) 1))
+        (def indicate-ms (bufget-u16 data 2))
+
+        ; Track when message was received
+        (def indicator-timestamp (systime))
+    })
+
     (free data)
 })
 

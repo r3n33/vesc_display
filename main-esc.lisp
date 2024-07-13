@@ -9,6 +9,8 @@
 (def buf-canid23 (array-create 8))
 (def buf-canid24 (array-create 8))
 
+(def buf-canid30 (array-create 8))
+
 @const-start
 
 (spawn (fn ()
@@ -47,3 +49,33 @@
                 (can-send-sid 24 buf-canid24)
                 (sleep 0.1) ; 10 Hz
 ))))
+
+; TODO: Fake indicator signal
+(spawn (fn () {
+    ; Sending initial signal that would not have measured the Indicator Duration
+        (bufset-u8 buf-canid30 0 1) ; L Indicator ON
+        (bufset-u8 buf-canid30 1 1) ; R Indicator ON
+        (bufset-u16 buf-canid30 2 0) ; Indicator ON milliseconds
+        (can-send-sid 30 buf-canid30)
+    (sleep 0.65)
+        (bufset-u8 buf-canid30 0 0) ; L Indicator OFF
+        (bufset-u8 buf-canid30 1 0) ; R Indicator OFF
+        (bufset-u16 buf-canid30 2 0) ; Indicator ON milliseconds
+        (can-send-sid 30 buf-canid30)
+    (sleep 0.5)
+
+    ; Sending indicator signals with measured Indicator Duration
+    (loopwhile t
+        (progn
+                (bufset-u8 buf-canid30 0 1) ; L Indicator ON
+                (bufset-u8 buf-canid30 1 1) ; R Indicator ON
+                (bufset-u16 buf-canid30 2 650) ; Indicator ON milliseconds
+                (can-send-sid 30 buf-canid30)
+            (sleep 0.65)
+                (bufset-u8 buf-canid30 0 0) ; L Indicator OFF
+                (bufset-u8 buf-canid30 1 0) ; R Indicator OFF
+                (bufset-u16 buf-canid30 2 650) ; Indicator ON milliseconds
+                (can-send-sid 30 buf-canid30)
+            (sleep 0.5)
+    ))
+}))

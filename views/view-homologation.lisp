@@ -1,4 +1,4 @@
-
+(def view-previous-stats (list))
 
 @const-start
 
@@ -97,7 +97,7 @@
 
         ; Update Speed Arrow
         (var arrow-x-max (- 141 24))
-        (def arrow-x (if (> stats-kmh-max 0.0)
+        (var arrow-x (if (> stats-kmh-max 0.0)
             (* arrow-x-max (/ stats-kmh stats-kmh-max))
             0
         ))

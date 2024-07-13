@@ -1,5 +1,10 @@
 @const-start
 
+; TODO: Relocate to a better home
+(def indicate-l-on nil)
+(def indicate-r-on nil)
+(def indicate-ms 0)
+
 (defun view-init-homologation  () {
     (def buf-stripe-bg (img-buffer-from-bin icon-stripe))
     (def buf-stripe-fg (img-buffer 'indexed16 141 19))
@@ -28,20 +33,15 @@
     (var colors-blue-icon '(0x000000 0x020040 0x000077 0x1d00e8))
     (var colors-dim-icon '(0x000000 0x090909 0x101010 0x171717))
 
-    (disp-render buf-blink-left 1 1 colors-green-icon)
+    (disp-render buf-blink-left 1 1 colors-dim-icon)
     (disp-render buf-blink-right (- 319 (first (img-dims buf-blink-right))) 1 colors-dim-icon)
     (disp-render buf-cruise-control 10 44 colors-dim-icon)
     (disp-render buf-lights 165 1 colors-green-icon)
     (disp-render buf-highbeam 104 1 colors-blue-icon)
     (disp-render buf-kickstand 265 116 colors-red-icon)
 
-    (def test-blink-on true)
-    (def test-blink-anim-time (systime))
-    (def test-blink-anim-duration 0.75)
-    (def buf-blink-anim (img-buffer 'indexed4 62 18))
-    (var colors-anim '(0x000000 0x000000 0x171717 0x00ff00))
-    ;(draw-turn-animation buf-blink-anim 'left (clamp01 (/ (secs-since test-blink-anim-time) test-blink-anim-duration)))
-    ;(disp-render buf-blink-anim 38 11 colors-anim) ; Left side
+    ; Buffer used for L and R Indicator Animations
+    (def buf-indicate-anim (img-buffer 'indexed4 62 18))
 
     (view-init-menu)
     (defun on-btn-0-long-pressed () {
@@ -120,38 +120,25 @@
         (txt-block-c buf-battery-soc (list 0 1 2 3) (/ (first (img-dims buf-battery-soc)) 2) 0 font15 (str-merge (str-from-n displayed-soc "%0.0f") "%"))
     })
 
+    ; TODO: Indicator testing
     (var colors-green-icon '(0x000000 0x005400 0x00b800 0x00ff00))
     (var colors-dim-icon '(0x000000 0x090909 0x101010 0x171717))
     (var colors-anim '(0x000000 0x000000 0x171717 0x00ff00))
-    (var anim-pct (clamp01 (/ (secs-since test-blink-anim-time) test-blink-anim-duration)))
-    (if test-blink-on
-        (draw-turn-animation buf-blink-anim 'left anim-pct 'off-cyle)
-        (draw-turn-animation buf-blink-anim 'left anim-pct 'on-cycle)
+    (var anim-pct 1.0)
+    (if (> indicate-ms 0)
+        (setq anim-pct (clamp01 (/ (secs-since indicator-timestamp) (/ indicate-ms 1000.0))))
     )
+    (if indicate-l-on {
+        (draw-turn-animation buf-indicate-anim 'left anim-pct)
+        (disp-render buf-indicate-anim 38 11 colors-anim) ; Left side
+        (disp-render buf-blink-left 1 1 colors-green-icon)
+    } (disp-render buf-blink-left 1 1 colors-dim-icon))
 
-    (disp-render buf-blink-anim 38 11 colors-anim) ; Left side
-
-    (if test-blink-on
-        (draw-turn-animation buf-blink-anim 'right anim-pct 'on-cycle)
-        (draw-turn-animation buf-blink-anim 'right anim-pct 'off-cycle)
-    )
-
-    (disp-render buf-blink-anim 218 11 colors-anim) ; Right side
-
-    (if (eq anim-pct 1.0) {
-        ; Alternate indicator illumination
-        (if test-blink-on {
-            (disp-render buf-blink-left 1 1 colors-dim-icon)
-            (disp-render buf-blink-right (- 319 (first (img-dims buf-blink-right))) 1 colors-dim-icon)
-            (def test-blink-on false)
-        } {
-            (disp-render buf-blink-left 1 1 colors-green-icon)
-            (disp-render buf-blink-right (- 319 (first (img-dims buf-blink-right))) 1 colors-green-icon)
-            (def test-blink-on true)
-        })
-        ; Reset animation time
-        (def test-blink-anim-time (systime))
-    })
+    (if indicate-r-on {
+        (draw-turn-animation buf-indicate-anim 'right anim-pct)
+        (disp-render buf-indicate-anim 218 11 colors-anim) ; Right side
+        (disp-render buf-blink-right (- 319 (first (img-dims buf-blink-right))) 1 colors-green-icon)
+    } (disp-render buf-blink-right (- 319 (first (img-dims buf-blink-right))) 1 colors-dim-icon))
 })
 
 (defun view-render-homologation () {

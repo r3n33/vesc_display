@@ -3,6 +3,16 @@
 
 @const-start
 
+(defun spooky-light-glitch () {
+    (var start-time (systime))
+    (loopwhile (< (secs-since start-time) 2.5) {
+        (disp-render buf-lights 165 1 colors-dim-icon)
+        (sleep (/ (mod (rand) 200) 1000.0))
+        (disp-render buf-lights 165 1 colors-green-icon)
+        (sleep (/ (mod (rand) 200) 1000.0))
+    })
+})
+
 (defun view-init-homologation  () {
     (def buf-stripe-bg (img-buffer-from-bin icon-stripe))
     (def buf-stripe-fg (img-buffer 'indexed16 141 19))
@@ -41,6 +51,8 @@
     (disp-render buf-kickstand 270 116 colors-red-icon)
     (disp-render buf-warning-icon 190 50 colors-dim-icon)
     (disp-render buf-neutral-mode 270 172 colors-green-icon)
+
+    (spooky-light-glitch) ; TODO: Needed a mental break - this is just silly
 
     (view-init-menu)
     (defun on-btn-0-long-pressed () {

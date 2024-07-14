@@ -1,3 +1,4 @@
+(def view-state-now (list))
 (def view-state-previous (list))
 
 @const-start
@@ -56,6 +57,16 @@
     })
     (defun on-btn-3-pressed () (def state-view-next (next-view)))
 
+    (def view-state-now (list
+        stats-kmh
+        (to-i (* 100 stats-battery-soc))
+        highbeam-on
+        kickstand-down
+        drive-mode-active
+        performance-mode
+        indicate-l-on
+        indicate-r-on
+    ))
     (def view-state-previous (list 'stats-kmh 'stats-battery-soc 'highbeam-on 'kickstand-down 'drive-mode 'performance-mode 'indicate-l-on 'indicate-r-on))
 
     (disp-render buf-stripe-bg 5 93
@@ -81,22 +92,34 @@
 
 (defun view-draw-homologation () {
 
+    ; Update state before buffering new content
+    (def view-state-now (list
+        stats-kmh
+        (to-i (* 100 stats-battery-soc))
+        highbeam-on
+        kickstand-down
+        drive-mode-active
+        performance-mode
+        indicate-l-on
+        indicate-r-on
+    ))
+
     ; Ensure re-draw between kickstand states
-    (if (not-eq kickstand-down (ix view-state-previous 3)) {
+    (if (not-eq (ix view-state-now 3) (ix view-state-previous 3)) {
         (setix view-state-previous 0 'update-speed)
         (setix view-state-previous 1 'update-battery-soc)
     })
 
     ; Draw Speed
-    (if (not-eq stats-kmh (first view-state-previous)) {
+    (if (not-eq (ix view-state-now 0) (first view-state-previous)) {
         ; Update Speed
         (img-clear buf-units)
         (draw-units buf-units 0 0 (list 0 1 2 3) font15)
 
         (img-clear buf-speed)
         (var speed-now (match (car settings-units-speeds)
-            (kmh stats-kmh)
-            (mph (* stats-kmh km-to-mi))
+            (kmh (ix view-state-now 0))
+            (mph (* (ix view-state-now 0) km-to-mi))
             (_ (print "Unexpected settings-units-speeds value"))
         ))
         (txt-block-c buf-speed (list 0 1 2 3) 87 0 font88 (str-from-n speed-now "%0.0f"))
@@ -104,7 +127,7 @@
         ; Update Speed Arrow
         (var arrow-x-max (- 141 24))
         (var arrow-x (if (> stats-kmh-max 0.0)
-            (* arrow-x-max (/ stats-kmh stats-kmh-max))
+            (* arrow-x-max (/ (ix view-state-now 0) stats-kmh-max))
             0
         ))
         (img-blit buf-stripe-fg buf-stripe-top 0 0 -1)
@@ -117,28 +140,29 @@
     })
 
     ; Draw Batteries
-    (if (not-eq (to-i (* 100 stats-battery-soc)) (second view-state-previous)) {
+    (if (not-eq (ix view-state-now 1) (second view-state-previous)) {
         ; Update Battery %
         (img-clear buf-battery-a-sm)
         (img-clear buf-battery-b-sm)
-        (var displayed-soc (* 100 stats-battery-soc))
+        (var soc-now (/ (ix view-state-now 1) 100.0))
+        (var displayed-soc (ix view-state-now 1))
         (if (< displayed-soc 0) (setq displayed-soc 0))
 
         ; Battery A
-        (draw-battery-vertical buf-battery-a-sm (first (img-dims buf-battery-a-sm)) (second (img-dims buf-battery-a-sm)) stats-battery-soc 1)
+        (draw-battery-vertical buf-battery-a-sm (first (img-dims buf-battery-a-sm)) (second (img-dims buf-battery-a-sm)) soc-now 1)
         (img-clear buf-battery-a-sm-soc)
-        (txt-block-v buf-battery-a-sm-soc (list 0 1 2 3) (first (img-dims buf-battery-a-sm-soc)) (second (img-dims buf-battery-a-sm-soc)) font15 (str-merge "%" (str-from-n displayed-soc "%0.0f")))
+        (txt-block-v buf-battery-a-sm-soc (list 0 1 2 3) (first (img-dims buf-battery-a-sm-soc)) (second (img-dims buf-battery-a-sm-soc)) font15 (str-merge "%" (str-from-n displayed-soc "%d")))
 
         ; TODO: Fake Battery B Value
-        (draw-battery-vertical buf-battery-b-sm (first (img-dims buf-battery-b-sm)) (second (img-dims buf-battery-b-sm)) stats-battery-soc 1)
+        (draw-battery-vertical buf-battery-b-sm (first (img-dims buf-battery-b-sm)) (second (img-dims buf-battery-b-sm)) soc-now 1)
         (img-clear buf-battery-b-sm-soc)
-        (txt-block-v buf-battery-b-sm-soc (list 0 1 2 3) (first (img-dims buf-battery-b-sm-soc)) (second (img-dims buf-battery-b-sm-soc)) font15 (str-merge "%" (str-from-n displayed-soc "%0.0f")))
+        (txt-block-v buf-battery-b-sm-soc (list 0 1 2 3) (first (img-dims buf-battery-b-sm-soc)) (second (img-dims buf-battery-b-sm-soc)) font15 (str-merge "%" (str-from-n displayed-soc "%d")))
 
         ; TODO: Large batteries
-        (if kickstand-down {
+        (if (ix view-state-now 3) {
             (img-clear buf-speed)
-            (draw-battery-horizontal buf-speed 18 10 130 27 stats-battery-soc 1)
-            (draw-battery-horizontal buf-speed 18 55 130 27 stats-battery-soc 1)
+            (draw-battery-horizontal buf-speed 18 10 130 27 soc-now 1)
+            (draw-battery-horizontal buf-speed 18 55 130 27 soc-now 1)
         })
     })
 
@@ -147,22 +171,22 @@
     (if (> indicate-ms 0)
         (setq anim-pct (clamp01 (/ (secs-since indicator-timestamp) (/ indicate-ms 1000.0))))
     )
-    (if indicate-l-on (draw-turn-animation buf-indicate-l-anim 'left anim-pct))
-    (if indicate-r-on (draw-turn-animation buf-indicate-r-anim 'right anim-pct))
+    (if (ix view-state-now 6) (draw-turn-animation buf-indicate-l-anim 'left anim-pct))
+    (if (ix view-state-now 7) (draw-turn-animation buf-indicate-r-anim 'right anim-pct))
 
     ; Indicator Left Completed
-    (if (not-eq indicate-l-on (ix view-state-previous 6)) {
-        (if (not indicate-l-on) (draw-turn-animation buf-indicate-l-anim 'left 1.0))
+    (if (not-eq (ix view-state-now 6) (ix view-state-previous 6)) {
+        (if (not (ix view-state-now 6)) (draw-turn-animation buf-indicate-l-anim 'left 1.0))
     })
 
     ; Indicator Right Completed
-    (if (not-eq indicate-r-on (ix view-state-previous 7)) {
-        (if (not indicate-r-on) (draw-turn-animation buf-indicate-r-anim 'right 1.0))
+    (if (not-eq (ix view-state-now 7) (ix view-state-previous 7)) {
+        (if (not (ix view-state-now 7)) (draw-turn-animation buf-indicate-r-anim 'right 1.0))
     })
 
     ; Performance Mode
-    (if (not-eq performance-mode (ix view-state-previous 5)) {
-        (match performance-mode
+    (if (not-eq (ix view-state-now 5) (ix view-state-previous 5)) {
+        (match (ix view-state-now 5)
             (eco (txt-block-c buf-performance-mode (list 0 1 2 3) (/ (first (img-dims buf-performance-mode)) 2) 0 font18 (to-str "ECO")))
             (normal (txt-block-c buf-performance-mode (list 0 1 2 3) (/ (first (img-dims buf-performance-mode)) 2) 0 font18 (to-str "NML")))
             (sport (txt-block-c buf-performance-mode (list 0 1 2 3) (/ (first (img-dims buf-performance-mode)) 2) 0 font18 (to-str "SPT")))
@@ -175,9 +199,9 @@
     (var colors-anim '(0x000000 0x000000 0x171717 0x00ff00))
 
     ; Indicator Left
-    (if indicate-l-on (disp-render buf-indicate-l-anim 38 11 colors-anim))
-    (if (not-eq indicate-l-on (ix view-state-previous 6)) {
-        (if indicate-l-on
+    (if (ix view-state-now 6) (disp-render buf-indicate-l-anim 38 11 colors-anim))
+    (if (not-eq (ix view-state-now 6) (ix view-state-previous 6)) {
+        (if (ix view-state-now 6)
             (disp-render buf-blink-left 1 1 colors-green-icon)
             {
                 (disp-render buf-blink-left 1 1 colors-dim-icon)
@@ -187,9 +211,9 @@
     })
 
     ; Indicator Right
-    (if indicate-r-on (disp-render buf-indicate-r-anim 218 11 colors-anim))
-    (if (not-eq indicate-r-on (ix view-state-previous 7)) {
-        (if indicate-r-on
+    (if (ix view-state-now 7) (disp-render buf-indicate-r-anim 218 11 colors-anim))
+    (if (not-eq (ix view-state-now 7) (ix view-state-previous 7)) {
+        (if (ix view-state-now 7)
             (disp-render buf-blink-right (- 319 (first (img-dims buf-blink-right))) 1 colors-green-icon)
             {
                 (disp-render buf-blink-right (- 319 (first (img-dims buf-blink-right))) 1 colors-dim-icon)
@@ -199,16 +223,16 @@
     })
 
     ; Highbeam
-    (if (not-eq highbeam-on (third view-state-previous)) {
-        (if highbeam-on
+    (if (not-eq (ix view-state-now 2) (third view-state-previous)) {
+        (if (ix view-state-now 2)
             (disp-render buf-highbeam 104 1 colors-blue-icon)
             (disp-render buf-highbeam 104 1 colors-dim-icon)
         )
     })
 
     ; Kickstand
-    (if (not-eq kickstand-down (ix view-state-previous 3)) {
-        (if kickstand-down {
+    (if (not-eq (ix view-state-now 3) (ix view-state-previous 3)) {
+        (if (ix view-state-now 3) {
             ; Render Speed buffer containing Large Batteries
             (disp-render buf-speed 0 130 colors-white-icon)
             (disp-render buf-units 175 222 '(0x0 0x0 0x0 0x0)) ; Hide Speed Units
@@ -231,8 +255,8 @@
     })
 
     ; Speed Now
-    (if (not kickstand-down)
-        (if (not-eq stats-kmh (first view-state-previous)) {
+    (if (not (ix view-state-now 3))
+        (if (not-eq (ix view-state-now 0) (first view-state-previous)) {
             (disp-render buf-speed 0 130 colors-white-icon)
             (disp-render buf-units 175 222 colors-white-icon)
 
@@ -258,14 +282,14 @@
     )
 
     ; Batteries (after processing kickstand-down)
-    (if (not-eq (to-i (* 100 stats-battery-soc)) (second view-state-previous)) {
+    (if (not-eq (ix view-state-now 1) (second view-state-previous)) {
         (var color 0x7f9a0d)
         (if (< stats-battery-soc 0.5)
             (setq color (lerp-color 0xe72a62 0xffa500 (ease-in-out-quint (* stats-battery-soc 2))))
             (setq color (lerp-color 0xffa500 0x7f9a0d (ease-in-out-quint (* (- stats-battery-soc 0.5) 2))))
         )
 
-        (if kickstand-down
+        (if (ix view-state-now 3)
             ; Render speed buffer containing large battiers when parked
             (disp-render buf-speed 0 130 `(0x000000 0xfbfcfc ,color 0x0000ff))
             ; Render small batteries
@@ -281,28 +305,28 @@
     })
 
     ; Drive Mode
-    (if (not-eq drive-mode-active (ix view-state-previous 4)) {
-        (if drive-mode-active
+    (if (not-eq (ix view-state-now 4) (ix view-state-previous 4)) {
+        (if (ix view-state-now 4)
             (disp-render buf-drive-mode 270 172 colors-white-icon)
             (disp-render buf-neutral-mode 270 172 colors-green-icon)
         )
     })
 
     ; Performance Mode
-    (if (not-eq performance-mode (ix view-state-previous 5)) {
+    (if (not-eq (ix view-state-now 5) (ix view-state-previous 5)) {
         (disp-render buf-performance-mode 262 220 colors-white-icon)
     })
 
     ; Update stats for improved performance
     (def view-state-previous (list
-        stats-kmh
-        (to-i (* 100 stats-battery-soc))
-        highbeam-on
-        kickstand-down
-        drive-mode-active
-        performance-mode
-        indicate-l-on
-        indicate-r-on
+        (ix view-state-now 0)
+        (ix view-state-now 1)
+        (ix view-state-now 2)
+        (ix view-state-now 3)
+        (ix view-state-now 4)
+        (ix view-state-now 5)
+        (ix view-state-now 6)
+        (ix view-state-now 7)
     ))
 
     ; Render Warning Icon

@@ -57,7 +57,6 @@
     (defun on-btn-3-pressed () (def state-view-next (next-view)))
 
     (def view-state-previous (list 'stats-kmh 'stats-battery-soc 'highbeam-on 'kickstand-down 'drive-mode 'performance-mode 'indicate-l-on 'indicate-r-on))
-    (def view-state-previous (list 'stats-kmh 'stats-battery-soc 'highbeam-on 'kickstand-down 'drive-mode 'performance-mode 'indicate-l-on 'indicate-r-on))
 
     (disp-render buf-stripe-bg 5 93
         '(
@@ -81,6 +80,13 @@
 })
 
 (defun view-draw-homologation () {
+
+    ; Ensure re-draw between kickstand states
+    (if (not-eq kickstand-down (ix view-state-previous 3)) {
+        (setix view-state-previous 0 'update-speed)
+        (setix view-state-previous 1 'update-battery-soc)
+    })
+
     ; Draw Speed
     (if (not-eq stats-kmh (first view-state-previous)) {
         ; Update Speed
@@ -119,14 +125,21 @@
         (if (< displayed-soc 0) (setq displayed-soc 0))
 
         ; Battery A
-        (draw-battery-soc buf-battery-a-sm (first (img-dims buf-battery-a-sm)) (second (img-dims buf-battery-a-sm)) stats-battery-soc 1)
+        (draw-battery-vertical buf-battery-a-sm (first (img-dims buf-battery-a-sm)) (second (img-dims buf-battery-a-sm)) stats-battery-soc 1)
         (img-clear buf-battery-a-sm-soc)
         (txt-block-v buf-battery-a-sm-soc (list 0 1 2 3) (first (img-dims buf-battery-a-sm-soc)) (second (img-dims buf-battery-a-sm-soc)) font15 (str-merge "%" (str-from-n displayed-soc "%0.0f")))
 
         ; TODO: Fake Battery B Value
-        (draw-battery-soc buf-battery-b-sm (first (img-dims buf-battery-b-sm)) (second (img-dims buf-battery-b-sm)) stats-battery-soc 1)
+        (draw-battery-vertical buf-battery-b-sm (first (img-dims buf-battery-b-sm)) (second (img-dims buf-battery-b-sm)) stats-battery-soc 1)
         (img-clear buf-battery-b-sm-soc)
         (txt-block-v buf-battery-b-sm-soc (list 0 1 2 3) (first (img-dims buf-battery-b-sm-soc)) (second (img-dims buf-battery-b-sm-soc)) font15 (str-merge "%" (str-from-n displayed-soc "%0.0f")))
+
+        ; TODO: Large batteries
+        (if kickstand-down {
+            (img-clear buf-speed)
+            (draw-battery-horizontal buf-speed 18 10 130 27 stats-battery-soc 1)
+            (draw-battery-horizontal buf-speed 18 55 130 27 stats-battery-soc 1)
+        })
     })
 
     ; Indicators
@@ -193,15 +206,12 @@
         )
     })
 
-    ; Kickstand Area
+    ; Kickstand
     (if (not-eq kickstand-down (ix view-state-previous 3)) {
         (if kickstand-down {
-            ; TODO: Render Large batteries
-
-            ; TODO: Temporarily clearing large speed
-            {
-                (disp-render buf-speed 0 130 '(0x0 0x0 0x0 0x0))
-            }
+            ; Render Speed buffer containing Large Batteries
+            (disp-render buf-speed 0 130 colors-white-icon)
+            (disp-render buf-units 175 222 '(0x0 0x0 0x0 0x0)) ; Hide Speed Units
 
             ; Clear small batteries
             (disp-render buf-battery-a-sm 262 92 '(0x0 0x0 0x0 0x0))
@@ -211,7 +221,10 @@
 
             ; Show kickstand down icon
             (disp-render buf-kickstand 270 116 colors-red-icon)
-        } (disp-render buf-kickstand 270 116 '(0x0 0x0 0x0 0x0)))
+        } {
+            (disp-render buf-kickstand 270 116 '(0x0 0x0 0x0 0x0)) ; Hide kickstand
+            (disp-render buf-units 175 222 colors-white-icon) ; Show Speed Units
+        })
 
         (setix view-state-previous 0 'update-speed)
         (setix view-state-previous 1 'update-battery-soc)
@@ -252,14 +265,19 @@
             (setq color (lerp-color 0xffa500 0x7f9a0d (ease-in-out-quint (* (- stats-battery-soc 0.5) 2))))
         )
 
-        (if (not kickstand-down) {
-            (disp-render buf-battery-a-sm 262 92 `(0x000000 0xfbfcfc ,color 0x0000ff))
-            (disp-render buf-battery-a-sm-soc 259 40 colors-white-icon)
+        (if kickstand-down
+            ; Render speed buffer containing large battiers when parked
+            (disp-render buf-speed 0 130 `(0x000000 0xfbfcfc ,color 0x0000ff))
+            ; Render small batteries
+            {
+                (disp-render buf-battery-a-sm 262 92 `(0x000000 0xfbfcfc ,color 0x0000ff))
+                (disp-render buf-battery-a-sm-soc 259 40 colors-white-icon)
 
-            ; TODO: Fake Battery B Value
-            (disp-render buf-battery-b-sm 288 92 `(0x000000 0xfbfcfc ,color 0x0000ff))
-            (disp-render buf-battery-b-sm-soc 285 40 colors-white-icon)
-        })
+                ; TODO: Fake Battery B Value
+                (disp-render buf-battery-b-sm 288 92 `(0x000000 0xfbfcfc ,color 0x0000ff))
+                (disp-render buf-battery-b-sm-soc 285 40 colors-white-icon)
+            }
+        )
     })
 
     ; Drive Mode

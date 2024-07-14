@@ -94,7 +94,7 @@
     (img-rectangle img (+ x (- w line-w nub-width)) (+ y nub-indent) nub-width (- h (* nub-indent 2)) 1 `(thickness ,line-w))
 
     ; Fill
-    (var fill-w (* (- w nub-width line-w) soc))
+    (var fill-w (* (- w nub-width (* line-w 2)) soc))
     (if (< fill-w 1) (setq fill-w 1))
     (img-rectangle
         img
@@ -117,12 +117,12 @@
     (img-rectangle img nub-indent 0 (- w (* nub-indent 2)) nub-bottom 1 `(thickness ,line-w))
 
     ; Fill
-    (var fill-h (* (- h nub-bottom line-w) soc))
+    (var fill-h (* (- h nub-bottom (* line-w 2)) soc))
     (if (< fill-h 1) (setq fill-h 1))
     (img-rectangle
         img
         line-w
-        (+ (+ nub-bottom (* line-w 2)) (- h fill-h nub-bottom))
+        (+ nub-bottom (- h fill-h nub-bottom line-w))
         (- w (* line-w 2)) 
         fill-h
         2 '(filled))

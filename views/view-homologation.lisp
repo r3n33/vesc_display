@@ -1,4 +1,4 @@
-(def view-previous-stats (list))
+(def view-state-previous (list))
 
 @const-start
 
@@ -22,6 +22,8 @@
 
     (def buf-blink-left (img-buffer-from-bin icon-blinker-left))
     (def buf-blink-right (img-buffer-from-bin icon-blinker-right))
+    (def buf-indicate-l-anim (img-buffer 'indexed4 62 18))
+    (def buf-indicate-r-anim (img-buffer 'indexed4 62 18))
     (def buf-cruise-control (img-buffer-from-bin icon-cruise-control))
     (def buf-lights (img-buffer-from-bin icon-lights))
     (def buf-highbeam (img-buffer-from-bin icon-highbeam))
@@ -39,16 +41,13 @@
     (disp-render buf-warning-icon 190 50 colors-dim-icon)
     (disp-render buf-neutral-mode 270 172 colors-green-icon)
 
-    ; Buffer used for L and R Indicator Animations
-    (def buf-indicate-anim (img-buffer 'indexed4 62 18))
-
     (view-init-menu)
     (defun on-btn-0-long-pressed () {
         (hw-sleep)
     })
     (defun on-btn-2-pressed () {
         (setting-units-cycle)
-        (setix view-previous-stats 0 'stats-kmh) ; Re-draw units
+        (setix view-state-previous 0 'stats-kmh) ; Re-draw units
 
     })
     (defun on-btn-2-long-pressed () {
@@ -57,7 +56,8 @@
     })
     (defun on-btn-3-pressed () (def state-view-next (next-view)))
 
-    (def view-previous-stats (list 'stats-kmh 'stats-battery-soc 'highbeam-on 'kickstand-down 'drive-mode 'performance-mode))
+    (def view-state-previous (list 'stats-kmh 'stats-battery-soc 'highbeam-on 'kickstand-down 'drive-mode 'performance-mode 'indicate-l-on 'indicate-r-on))
+    (def view-state-previous (list 'stats-kmh 'stats-battery-soc 'highbeam-on 'kickstand-down 'drive-mode 'performance-mode 'indicate-l-on 'indicate-r-on))
 
     (disp-render buf-stripe-bg 5 93
         '(
@@ -82,7 +82,7 @@
 
 (defun view-draw-homologation () {
     ; Draw Speed
-    (if (not-eq stats-kmh (first view-previous-stats)) {
+    (if (not-eq stats-kmh (first view-state-previous)) {
         ; Update Speed
         (img-clear buf-units)
         (draw-units buf-units 0 0 (list 0 1 2 3) font15)
@@ -111,7 +111,7 @@
     })
 
     ; Draw Batteries
-    (if (not-eq (to-i (* 100 stats-battery-soc)) (second view-previous-stats)) {
+    (if (not-eq (to-i (* 100 stats-battery-soc)) (second view-state-previous)) {
         ; Update Battery %
         (img-clear buf-battery-a-sm)
         (img-clear buf-battery-b-sm)
@@ -129,26 +129,26 @@
         (txt-block-v buf-battery-b-sm-soc (list 0 1 2 3) (first (img-dims buf-battery-b-sm-soc)) (second (img-dims buf-battery-b-sm-soc)) font15 (str-merge "%" (str-from-n displayed-soc "%0.0f")))
     })
 
-    ; TODO: Indicator testing
-    (var colors-anim '(0x000000 0x000000 0x171717 0x00ff00))
+    ; Indicators
     (var anim-pct 1.0)
     (if (> indicate-ms 0)
         (setq anim-pct (clamp01 (/ (secs-since indicator-timestamp) (/ indicate-ms 1000.0))))
     )
-    (if indicate-l-on {
-        (draw-turn-animation buf-indicate-anim 'left anim-pct)
-        (disp-render buf-indicate-anim 38 11 colors-anim) ; Left side
-        (disp-render buf-blink-left 1 1 colors-green-icon)
-    } (disp-render buf-blink-left 1 1 colors-dim-icon))
+    (if indicate-l-on (draw-turn-animation buf-indicate-l-anim 'left anim-pct))
+    (if indicate-r-on (draw-turn-animation buf-indicate-r-anim 'right anim-pct))
 
-    (if indicate-r-on {
-        (draw-turn-animation buf-indicate-anim 'right anim-pct)
-        (disp-render buf-indicate-anim 218 11 colors-anim) ; Right side
-        (disp-render buf-blink-right (- 319 (first (img-dims buf-blink-right))) 1 colors-green-icon)
-    } (disp-render buf-blink-right (- 319 (first (img-dims buf-blink-right))) 1 colors-dim-icon))
+    ; Indicator Left Completed
+    (if (not-eq indicate-l-on (ix view-state-previous 6)) {
+        (if (not indicate-l-on) (draw-turn-animation buf-indicate-l-anim 'left 1.0))
+    })
+
+    ; Indicator Right Completed
+    (if (not-eq indicate-r-on (ix view-state-previous 7)) {
+        (if (not indicate-r-on) (draw-turn-animation buf-indicate-r-anim 'right 1.0))
+    })
 
     ; Performance Mode
-    (if (not-eq performance-mode (ix view-previous-stats 5)) {
+    (if (not-eq performance-mode (ix view-state-previous 5)) {
         (match performance-mode
             (eco (txt-block-c buf-performance-mode (list 0 1 2 3) (/ (first (img-dims buf-performance-mode)) 2) 0 font18 (to-str "ECO")))
             (normal (txt-block-c buf-performance-mode (list 0 1 2 3) (/ (first (img-dims buf-performance-mode)) 2) 0 font18 (to-str "NML")))
@@ -159,8 +159,34 @@
 
 (defun view-render-homologation () {
 
+    (var colors-anim '(0x000000 0x000000 0x171717 0x00ff00))
+
+    ; Indicator Left
+    (if indicate-l-on (disp-render buf-indicate-l-anim 38 11 colors-anim))
+    (if (not-eq indicate-l-on (ix view-state-previous 6)) {
+        (if indicate-l-on
+            (disp-render buf-blink-left 1 1 colors-green-icon)
+            {
+                (disp-render buf-blink-left 1 1 colors-dim-icon)
+                (disp-render buf-indicate-l-anim 38 11 colors-anim)
+            }
+        )
+    })
+
+    ; Indicator Right
+    (if indicate-r-on (disp-render buf-indicate-r-anim 218 11 colors-anim))
+    (if (not-eq indicate-r-on (ix view-state-previous 7)) {
+        (if indicate-r-on
+            (disp-render buf-blink-right (- 319 (first (img-dims buf-blink-right))) 1 colors-green-icon)
+            {
+                (disp-render buf-blink-right (- 319 (first (img-dims buf-blink-right))) 1 colors-dim-icon)
+                (disp-render buf-indicate-r-anim 218 11 colors-anim)
+            }
+        )
+    })
+
     ; Highbeam
-    (if (not-eq highbeam-on (third view-previous-stats)) {
+    (if (not-eq highbeam-on (third view-state-previous)) {
         (if highbeam-on
             (disp-render buf-highbeam 104 1 colors-blue-icon)
             (disp-render buf-highbeam 104 1 colors-dim-icon)
@@ -168,7 +194,7 @@
     })
 
     ; Kickstand Area
-    (if (not-eq kickstand-down (ix view-previous-stats 3)) {
+    (if (not-eq kickstand-down (ix view-state-previous 3)) {
         (if kickstand-down {
             ; TODO: Render Large batteries
 
@@ -187,13 +213,13 @@
             (disp-render buf-kickstand 270 116 colors-red-icon)
         } (disp-render buf-kickstand 270 116 '(0x0 0x0 0x0 0x0)))
 
-        (setix view-previous-stats 0 'update-speed)
-        (setix view-previous-stats 1 'update-battery-soc)
+        (setix view-state-previous 0 'update-speed)
+        (setix view-state-previous 1 'update-battery-soc)
     })
 
     ; Speed Now
     (if (not kickstand-down)
-        (if (not-eq stats-kmh (first view-previous-stats)) {
+        (if (not-eq stats-kmh (first view-state-previous)) {
             (disp-render buf-speed 0 130 colors-white-icon)
             (disp-render buf-units 175 222 colors-white-icon)
 
@@ -219,7 +245,7 @@
     )
 
     ; Batteries (after processing kickstand-down)
-    (if (not-eq (to-i (* 100 stats-battery-soc)) (second view-previous-stats)) {
+    (if (not-eq (to-i (* 100 stats-battery-soc)) (second view-state-previous)) {
         (var color 0x7f9a0d)
         (if (< stats-battery-soc 0.5)
             (setq color (lerp-color 0xe72a62 0xffa500 (ease-in-out-quint (* stats-battery-soc 2))))
@@ -237,7 +263,7 @@
     })
 
     ; Drive Mode
-    (if (not-eq drive-mode-active (ix view-previous-stats 4)) {
+    (if (not-eq drive-mode-active (ix view-state-previous 4)) {
         (if drive-mode-active
             (disp-render buf-drive-mode 270 172 colors-white-icon)
             (disp-render buf-neutral-mode 270 172 colors-green-icon)
@@ -245,18 +271,20 @@
     })
 
     ; Performance Mode
-    (if (not-eq performance-mode (ix view-previous-stats 5)) {
+    (if (not-eq performance-mode (ix view-state-previous 5)) {
         (disp-render buf-performance-mode 262 220 colors-white-icon)
     })
 
     ; Update stats for improved performance
-    (def view-previous-stats (list
+    (def view-state-previous (list
         stats-kmh
         (to-i (* 100 stats-battery-soc))
         highbeam-on
         kickstand-down
         drive-mode-active
         performance-mode
+        indicate-l-on
+        indicate-r-on
     ))
 
     ; Render Warning Icon

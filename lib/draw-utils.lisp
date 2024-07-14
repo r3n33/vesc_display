@@ -82,7 +82,30 @@
     (img-blit img buf-temp w 0 -1 '(rotation 0 0 -90))
 })
 
-(defun draw-battery-soc (img w h soc line-w) {
+(defun draw-battery-horizontal (img x y w h soc line-w) {
+    (if (< soc 0.0) (setq soc 0.0))
+    (if (> soc 1.0) (setq soc 1.0))
+
+    (var nub-width (- w (* w 0.93)))
+    (var nub-indent (/ h 6))
+    ; Outline
+    (img-rectangle img x y (- w line-w nub-width) (- h line-w) 1 `(thickness ,line-w))
+    ; Nub
+    (img-rectangle img (+ x (- w line-w nub-width)) (+ y nub-indent) nub-width (- h (* nub-indent 2)) 1 `(thickness ,line-w))
+
+    ; Fill
+    (var fill-w (* (- w nub-width line-w) soc))
+    (if (< fill-w 1) (setq fill-w 1))
+    (img-rectangle
+        img
+        (+ x line-w)
+        (+ y line-w)
+        fill-w
+        (- h (* line-w 2))
+        2 '(filled))
+})
+
+(defun draw-battery-vertical (img w h soc line-w) {
     (if (< soc 0.0) (setq soc 0.0))
     (if (> soc 1.0) (setq soc 1.0))
 

@@ -52,7 +52,7 @@
     (disp-render buf-warning-icon 190 50 colors-dim-icon)
     (disp-render buf-neutral-mode 270 172 colors-green-icon)
 
-    (spooky-light-glitch) ; TODO: Needed a mental break - this is just silly
+    (if btn-3-pressed (spooky-light-glitch))
 
     (view-init-menu)
     (defun on-btn-0-long-pressed () {
@@ -173,8 +173,17 @@
         ; TODO: Large batteries
         (if (ix view-state-now 3) {
             (img-clear buf-speed)
-            (draw-battery-horizontal buf-speed 18 10 130 27 soc-now 1)
-            (draw-battery-horizontal buf-speed 18 55 130 27 soc-now 1)
+            (draw-battery-horizontal buf-speed 18 0 130 27 soc-now 1)
+            (draw-battery-horizontal buf-speed 18 47 130 27 soc-now 1)
+
+            (txt-block-l buf-speed '(0 0 3 1) 20 28 font18 (str-merge (str-from-n displayed-soc "%d") "%"))
+            ; TODO: If charging draw charge time remaining
+            (if (< displayed-soc 100) (txt-block-r buf-speed '(0 0 3 1) 160 28 font18 (str-merge "2h10m")))
+
+            ; TODO: Fake Battery B Value
+            (txt-block-l buf-speed '(0 0 3 1) 20 74 font18 (str-merge (str-from-n displayed-soc "%d") "%"))
+            ; TODO: If charging draw charge time remaining
+            (if (< displayed-soc 100) (txt-block-r buf-speed '(0 0 3 1) 160 74 font18 (str-merge "3h28m")))
         })
     })
 
@@ -303,7 +312,7 @@
 
         (if (ix view-state-now 3)
             ; Render speed buffer containing large battiers when parked
-            (disp-render buf-speed 0 130 `(0x000000 0xfbfcfc ,color 0x0000ff))
+            (disp-render buf-speed 0 130 `(0x000000 0xfbfcfc ,color 0x929491))
             ; Render small batteries
             {
                 (disp-render buf-battery-a-sm 262 92 `(0x000000 0xfbfcfc ,color 0x0000ff))

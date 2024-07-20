@@ -28,7 +28,7 @@
     (def buf-battery-a-sm-soc (img-buffer 'indexed4 20 50))
     (def buf-battery-b-sm-soc (img-buffer 'indexed4 20 50))
     
-    (def buf-speed (img-buffer 'indexed4 179 90))
+    (def buf-speed (img-buffer 'indexed16 179 90))
     (def buf-units (img-buffer 'indexed4 50 15))
 
     (def buf-blink-left (img-buffer-from-bin icon-blinker-left))
@@ -42,6 +42,7 @@
     (def buf-neutral-mode (img-buffer-from-bin icon-neutral))
     (def buf-drive-mode (img-buffer-from-bin icon-drive))
     (def buf-performance-mode (img-buffer 'indexed4 50 20))
+    (def buf-charge-bolt (img-buffer-from-bin icon-charge-bolt))
 
     (disp-render buf-blink-left 1 1 colors-dim-icon)
     (disp-render buf-blink-right (- 319 (first (img-dims buf-blink-right))) 1 colors-dim-icon)
@@ -173,17 +174,21 @@
         ; TODO: Large batteries
         (if (ix view-state-now 3) {
             (img-clear buf-speed)
-            (draw-battery-horizontal buf-speed 18 0 130 27 soc-now 1)
-            (draw-battery-horizontal buf-speed 18 47 130 27 soc-now 1)
+            (draw-battery-horizontal buf-speed 18 0 130 27 soc-now 1 1 4)
+            (draw-battery-horizontal buf-speed 18 47 130 27 soc-now 1 1 4)
 
-            (txt-block-l buf-speed '(0 0 3 1) 20 28 font18 (str-merge (str-from-n displayed-soc "%d") "%"))
+            ; TODO: If charging show charge icon
+            ;(img-blit buf-speed buf-charge-bolt 55 4 0)
+            (img-blit buf-speed buf-charge-bolt 55 51 0)
+
+            (txt-block-l buf-speed '(0 1 2 3) 20 28 font18 (str-merge (str-from-n displayed-soc "%d") "%"))
             ; TODO: If charging draw charge time remaining
-            (if (< displayed-soc 100) (txt-block-r buf-speed '(0 0 3 1) 160 28 font18 (str-merge "2h10m")))
+            ;(if (< displayed-soc 100) (txt-block-r buf-speed '(0 1 2 3) 160 28 font18 (str-merge "2h10m")))
 
             ; TODO: Fake Battery B Value
-            (txt-block-l buf-speed '(0 0 3 1) 20 74 font18 (str-merge (str-from-n displayed-soc "%d") "%"))
+            (txt-block-l buf-speed '(0 1 2 3) 20 74 font18 (str-merge (str-from-n displayed-soc "%d") "%"))
             ; TODO: If charging draw charge time remaining
-            (if (< displayed-soc 100) (txt-block-r buf-speed '(0 0 3 1) 160 74 font18 (str-merge "3h28m")))
+            (if (< displayed-soc 100) (txt-block-r buf-speed '(0 1 2 3) 160 74 font18 (str-merge "1h28m")))
         })
     })
 
@@ -312,7 +317,7 @@
 
         (if (ix view-state-now 3)
             ; Render speed buffer containing large battiers when parked
-            (disp-render buf-speed 0 130 `(0x000000 0xfbfcfc ,color 0x929491))
+            (disp-render buf-speed 0 130 `(0x000000 0x4f514f 0x929491 0xfbfcfc ,color))
             ; Render small batteries
             {
                 (disp-render buf-battery-a-sm 262 92 `(0x000000 0xfbfcfc ,color 0x0000ff))

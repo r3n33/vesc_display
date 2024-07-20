@@ -42,6 +42,7 @@
 (import "assets/kickstand-4c.bin" 'icon-kickstand)
 (import "assets/neutral-4c.bin" 'icon-neutral)
 (import "assets/drive-4c.bin" 'icon-drive)
+(import "assets/charge-bolt-4c.bin" 'icon-charge-bolt)
 
 (import "lib/vehicle-state.lisp" 'code-vehicle-state)
 (read-eval-program code-vehicle-state)

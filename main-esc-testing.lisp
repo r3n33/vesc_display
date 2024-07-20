@@ -1,6 +1,13 @@
 (import "pkg@://vesc_packages/lib_code_server/code_server.vescpkg" 'code-server)
 (read-eval-program code-server)
 
+(import "pkg::midi@://vesc_packages/lib_midi/midi.vescpkg" 'midi)
+(import "lib/audible-alerts.lisp" 'audible-alerts)
+(import "./assets/alerts/startup.mid" 'midi-startup)
+(import "./assets/alerts/ascend.mid" 'midi-ascend)
+(import "./assets/alerts/descend.mid" 'midi-descend)
+(read-eval-program audible-alerts)
+
 (start-code-server)
 
 (def buf-canid20 (array-create 8))
@@ -86,8 +93,6 @@
             (sleep 0.5)
 
             (setq highbeam-active (not highbeam-active))
-
-            (sleep 3.0)
     ))
 }))
 
@@ -104,12 +109,12 @@
         (bufset-u8 buf-canid31 0 1) ; Kickstand Up
         (bufset-u8 buf-canid31 1 1) ; Drive Mode Active
         (bufset-u8 buf-canid31 2 1) ; Performance Mode Normal
-        (set-current-rel 0.2)
+        ; TODO: Motor will spin: (set-current-rel 0.2)
         (var start-time (systime))
         (loopwhile (< (secs-since start-time) 1.0) {
             (sleep 0.1)
         })
-        (set-current-rel 0.0)
+        ; TODO: Motor will stop: (set-current-rel 0.0)
         (setq start-time (systime))
         (loopwhile (< (secs-since start-time) 2.0) {
             (sleep 0.1)

@@ -1,5 +1,9 @@
 @const-start
 
+(defun ease-in-out-sine (x)
+    (/ (- 1 (cos (* 3.14159 x))) 2)
+)
+
 (defun ease-in-out-quint (x)
     (if (< x 0.5)
         (* 16 x x x x x)

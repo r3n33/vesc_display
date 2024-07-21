@@ -19,9 +19,9 @@
 
         (sleep 0.04)
     })
-    (sleep 1) ; TODO: My ESC still needed time before midi would play
     (img-clear spin-buf)
     (disp-render spin-buf (- 160 32) (- 120 32) '(0x00 0x00))
+    (sleep 1) ; TODO: My ESC still needed time before midi would play
 })
 
 (defun start-boot-animation () {

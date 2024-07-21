@@ -54,15 +54,16 @@
                 (sleep 0.1) ; 10 Hz
 ))))
 
-; TODO: Fake indicator signals & highbeam
+; TODO: Fake indicator signals, highbeam indicator, cruise control state
 (def send-msg-30 false)
 (spawn (fn () {
     ; Sending initial signal that would not have measured the Indicator Duration
     (bufset-u8 buf-canid30 0 1) ; L Indicator ON
     (bufset-u8 buf-canid30 1 1) ; R Indicator ON
     (bufset-u16 buf-canid30 2 0) ; Indicator ON milliseconds
-    (bufset-u16 buf-canid30 4 0)
-    (bufset-u16 buf-canid30 6 0)
+    (bufset-u8 buf-canid30 4 0) ; Highbeam OFF
+    (bufset-u8 buf-canid30 5 0) ; Cruise Control OFF
+    (bufset-u16 buf-canid30 6 0) ; Cruise Control Speed
     (setq send-msg-30 true)
     (sleep 0.65)
 
@@ -76,6 +77,14 @@
     ; Sending indicator signals with measured Indicator Duration
     (loopwhile t
         (progn
+            (if highbeam-active {
+                (bufset-u8 buf-canid30 5 0) ; Cruise Control OFF
+                (bufset-u16 buf-canid30 6 (* 11.176 3.6 10)) ; Cruise Control Speed 25mph
+            } {
+                (bufset-u8 buf-canid30 5 1) ; Cruise Control ON
+                (bufset-u16 buf-canid30 6 (* 28.6111 3.6 10)) ; Cruise Control Speed 103kph
+            })
+
             (bufset-u8 buf-canid30 0 1) ; L Indicator ON
             (bufset-u8 buf-canid30 1 1) ; R Indicator ON
             (bufset-u16 buf-canid30 2 650) ; Indicator ON milliseconds
@@ -96,34 +105,39 @@
     ))
 }))
 
-; TODO: Fake kickstand, drive mode and performance mode
+; TODO: Fake kickstand, drive mode, performance mode, battery state
 (spawn (fn () (loopwhile t
     (progn
         ; Raise kickstand, leave in neutral
         (bufset-u8 buf-canid31 0 1) ; Kickstand Up
         (bufset-u8 buf-canid31 1 0) ; Drive Mode Inactive
         (bufset-u8 buf-canid31 2 0) ; Performance Mode ECO
+        (bufset-u8 buf-canid31 3 0) ; Battery A not Charging
+        (bufset-u8 buf-canid31 4 0) ; Battery B not Charging
+        (bufset-i16 buf-canid31 5 (* (get-batt) 1000)) ; Battery B SOC
         (sleep 3.0)
 
         ; Raise kickstand, Put in Drive Mode
         (bufset-u8 buf-canid31 0 1) ; Kickstand Up
         (bufset-u8 buf-canid31 1 1) ; Drive Mode Active
         (bufset-u8 buf-canid31 2 1) ; Performance Mode Normal
-        ; TODO: Motor will spin: (set-current-rel 0.2)
-        (var start-time (systime))
-        (loopwhile (< (secs-since start-time) 1.0) {
-            (sleep 0.1)
-        })
-        ; TODO: Motor will stop: (set-current-rel 0.0)
-        (setq start-time (systime))
-        (loopwhile (< (secs-since start-time) 2.0) {
-            (sleep 0.1)
-        })
+        (bufset-u8 buf-canid31 3 0) ; Battery A not Charging
+        (bufset-u8 buf-canid31 4 0) ; Battery B not Charging
+        (bufset-i16 buf-canid31 5 (* (get-batt) 1000)) ; Battery B SOC
+        (sleep 3.0)
 
         ; Lower kickstand, put in neutral
         (bufset-u8 buf-canid31 0 0) ; Kickstand Down
         (bufset-u8 buf-canid31 1 0) ; Drive Mode Inactive
         (bufset-u8 buf-canid31 2 2) ; Performance Mode Sport
+        (bufset-u8 buf-canid31 3 0) ; Battery A not Charging
+        (bufset-u8 buf-canid31 4 1) ; Battery B is Charging
+        (bufset-i16 buf-canid31 5 (* (get-batt) 1000)) ; Battery B SOC
+        (sleep 3.0)
+
+        ; Swap Charging Battery
+        (bufset-u8 buf-canid31 3 1) ; Battery A is Charging
+        (bufset-u8 buf-canid31 4 0) ; Battery B not Charging
         (sleep 3.0)
 ))))
 
@@ -136,8 +150,9 @@
         (can-send-sid 23 buf-canid23)
         (can-send-sid 24 buf-canid24)
 
-
+        (bufset-i16 buf-canid31 5 (* (get-batt) 1000)) ; Battery B SOC
         (can-send-sid 31 buf-canid31)
+
         (if send-msg-30 {
             (can-send-sid 30 buf-canid30)
             (setq send-msg-30 false)

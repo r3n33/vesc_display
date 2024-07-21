@@ -68,6 +68,9 @@
 
         (def highbeam-on (eq (bufget-u8 data 4) 1))
 
+        (def cruise-control-active (eq (bufget-u8 data 5) 1))
+        (def cruise-control-speed (/ (bufget-u16 data 6) 10.0))
+
         ; Track when message was received
         (def indicator-timestamp (systime))
     })
@@ -84,6 +87,11 @@
                 'eco
             })
         ))
+
+        (def battery-a-charging (eq (bufget-u8 data 3) 1))
+        (def battery-b-charging (eq (bufget-u8 data 4) 1))
+
+        (def battery-b-soc (/ (bufget-i16 data 5) 1000.0))
     })
 
     (free data)

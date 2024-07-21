@@ -8,15 +8,14 @@
     (loopwhile (< stats-vin 3.3) {
         ; Draw spinner
         (var scale (/ (secs-since start-time) spin-time))
-        (if (> (secs-since start-time) spin-time) (setq start-time (systime)))
 
-        (var angle (+ angle-previous 1 (* 10 (ease-in-out-sine scale))))
+        (var angle (+ angle-previous 3 (* 10 (ease-in-out-sine scale))))
         (if (> angle 360.0) (setq angle (- angle 360.0)))
 
         (img-clear spin-buf)
         (img-arc spin-buf 31 31 31 angle (+ angle 90) 1 '(thickness 8))
         (setq angle-previous angle)
-        (disp-render spin-buf (- 160 32) (- 120 32) '(0x00 0x191c1c))
+        (disp-render spin-buf (- 160 32) (- 120 32) '(0x00 0x037bc9))
 
         (sleep 0.04)
     })

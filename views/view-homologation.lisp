@@ -111,25 +111,7 @@
         'battery-b-soc
     ))
 
-    (disp-render buf-stripe-bg 5 93
-        '(
-            0x000000
-            0x1d9af7 ; top fg
-            0x1574b6 ; 2
-            0x0e5179 ; 3
-            0x143e59 ; 4
-            0x0e222f ; 5
-            0x00c7ff ; bottom fg
-            0x10b2e6 ; 7
-            0x1295bf ; 8
-            0x0984ac ; 9
-            0x007095 ; a
-            0x0e5179 ; b
-            0x08475c ; c
-            0x143e59 ; d
-            0x0e222f ; e
-        ))
-    (def buf-stripe-bg nil)
+    (disp-render buf-stripe-bg 5 93 colors-stripes-16c)
 })
 
 (defun view-draw-homologation () {
@@ -330,9 +312,15 @@
 
             ; Show kickstand down icon
             (disp-render buf-kickstand 270 116 colors-red-icon)
+
+            ; Hide Stripes
+            (disp-render buf-stripe-bg 5 93 '(0x0))
         } {
             (disp-render buf-kickstand 270 116 '(0x0 0x0 0x0 0x0)) ; Hide kickstand
             (disp-render buf-units 175 222 colors-white-icon) ; Show Speed Units
+
+            ; Show Stripes
+            (disp-render buf-stripe-bg 5 93 colors-stripes-16c)
         })
 
         (setix view-state-previous 0 'update-speed)

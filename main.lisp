@@ -19,6 +19,7 @@
 (import "fonts/font_12_15_aa.bin" 'font15)
 (import "fonts/font_15_18_aa.bin" 'font18)
 (import "fonts/font_22_24_aa.bin" 'font24)
+(import "fonts/font_21_32_aa_digits.bin" 'font32)
 (import "fonts/font_60_88_aa.bin" 'font88)
 (import "fonts/font_77_128_aa.bin" 'font128)
 
@@ -43,6 +44,7 @@
 (import "assets/neutral-4c.bin" 'icon-neutral)
 (import "assets/drive-4c.bin" 'icon-drive)
 (import "assets/charge-bolt-4c.bin" 'icon-charge-bolt)
+(import "assets/over-temp-4c.bin" 'icon-over-temp)
 
 (import "lib/vehicle-state.lisp" 'code-vehicle-state)
 (read-eval-program code-vehicle-state)

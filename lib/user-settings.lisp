@@ -18,7 +18,7 @@
             (def settings-units-temps '(fahrenheit . "F"))
         })
         (mph {
-            (def settings-units-speeds '(kmh . "Km/h"))
+            (def settings-units-speeds '(kmh . "km/h"))
             (def settings-units-temps '(celsius . "C"))
         })
         (_ (print "Unexpected settings-units-speeds value"))

@@ -9,4 +9,8 @@
 (def performance-mode 'eco) ; 'eco 'normal 'sport
 
 (def cruise-control-active false)
-(def curise-control-speed 0.0)
+(def cruise-control-speed 0.0)
+
+(def battery-a-charging false)
+(def battery-b-charging false)
+(def battery-b-soc 0.0)

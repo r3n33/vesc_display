@@ -66,7 +66,7 @@
             0x0e222f ; e
         ))
     (def buf-stripe-bg nil)
-    (var colors-text-aa '(0x000000 0x4f514f 0x929491 0xfbfcfc))
+
     (disp-render buf-motor-icon 8 10 colors-text-aa)
     (disp-render buf-esc-icon 64 10 colors-text-aa)
     (disp-render buf-battery-icon 126 10 colors-text-aa)
@@ -173,7 +173,6 @@
 })
 
 (defun view-render-main () {
-    (var colors-text-aa '(0x000000 0x4f514f 0x929491 0xfbfcfc))
     (if (not-eq stats-kmh (first view-previous-stats)) {
         (disp-render buf-speed 0 105 colors-text-aa)
         (disp-render buf-units 175 197 colors-text-aa)

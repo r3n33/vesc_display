@@ -97,7 +97,6 @@
         (def view-updated false)
         (disp-render buf-chart 40 60 '(0x000000 0x0000ff))
 
-        (var colors-text-aa '(0x000000 0x4f514f 0x929491 0xfbfcfc))
         (disp-render buf-chart-value 200 35 colors-text-aa)
         (disp-render buf-chart-value-min 0 188 colors-text-aa)
         (disp-render buf-chart-value-max 0 35 colors-text-aa)

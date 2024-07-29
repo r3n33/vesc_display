@@ -133,4 +133,11 @@
     })
 })
 
-(spawn display-thread)
+(spawn (fn () (loopwhile t {
+    (spawn-trap display-thread)
+    (recv   ((exit-error (? tid) (? e))
+                (print (str-merge "display-thread error: " (to-str e)))
+            )
+            ((exit-ok (? tid) (? v)) 'ok))
+    (sleep 1.0)
+})))

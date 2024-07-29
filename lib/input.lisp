@@ -36,7 +36,7 @@
     (def on-btn-3-repeat-press nil)
 })
 
-(defun thread-input () {
+(defun input-thread () {
     (input-cleanup-on-pressed)
     (var input-debounce-count 3)
     (var btn-0 0)
@@ -130,4 +130,11 @@
     })
 })
 
-(spawn thread-input)
+(spawn (fn () (loopwhile t {
+    (spawn-trap input-thread)
+    (recv   ((exit-error (? tid) (? e))
+                (print (str-merge "input-thread error: " (to-str e)))
+            )
+            ((exit-ok (? tid) (? v)) 'ok))
+    (sleep 1.0)
+})))

@@ -14,6 +14,7 @@
 (defun view-init-chart () {
     (def view-counter 0)
     (def value-avg 0)
+    (def values-per-point-previous 1)
     (def view-updated true)
     (def buf-chart-title (img-buffer 'indexed4 240 30))
     (def buf-chart-value (img-buffer 'indexed4 120 25))
@@ -65,11 +66,16 @@
 
     (var value-now (ix chart-items chart-value-index))
 
-    (def vales-per-point (if (< view-counter 45) 1 16))
-    (if (eq (mod view-counter vales-per-point) 0) {
+    (def values-per-point (if (< view-counter 45) 1 16))
+    (if (eq (mod view-counter values-per-point) 0) {
         (def view-updated true)
         (setq value-avg (+ value-avg value-now))
-        (setq live-chart-values (append-value live-chart-values (/ value-avg vales-per-point) 45))
+        ; Adjust value-avg when value-per-point changes
+        (if (not-eq values-per-point-previous values-per-point) {
+            (def value-avg (* value-now values-per-point))
+            (def values-per-point-previous values-per-point)
+        })
+        (setq live-chart-values (append-value live-chart-values (/ value-avg values-per-point) 45))
         (def value-avg 0)
 
         (if (> (length live-chart-values) 10) {

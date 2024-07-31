@@ -26,6 +26,7 @@
 
 
 (defun proc-sid (id data) {
+    ; TODO: consider cond to prevent extra evaluations
     (if (= id 20) {
         (def stats-battery-soc (/ (bufget-i16 data 0) 1000.0))
         (def stats-duty (/ (bufget-i16 data 2) 1000.0))
@@ -62,8 +63,8 @@
     })
 
     (if (= id 30) {
-        (def indicate-l-on (eq (bufget-u8 data 0) 1))
-        (def indicate-r-on (eq (bufget-u8 data 1) 1))
+        (var indicate-l (eq (bufget-u8 data 0) 1))
+        (var indicate-r (eq (bufget-u8 data 1) 1))
         (def indicate-ms (bufget-u16 data 2))
 
         (def highbeam-on (eq (bufget-u8 data 4) 1))
@@ -71,8 +72,16 @@
         (def cruise-control-active (eq (bufget-u8 data 5) 1))
         (def cruise-control-speed (/ (bufget-u16 data 6) 10.0))
 
-        ; Track when message was received
-        (def indicator-timestamp (systime))
+        ; Track when indicators activate for animation
+        (if (or
+                (and indicate-l (not indicate-l-on))
+                (and indicate-r (not indicate-r-on))
+            )
+                (def indicator-timestamp (systime))
+        )
+
+        (def indicate-l-on indicate-l)
+        (def indicate-r-on indicate-r)
     })
 
     (if (= id 31) {

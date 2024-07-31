@@ -18,9 +18,8 @@
         battery-a-charging                  ; 10
         battery-b-charging                  ; 11
         (to-i (* 100 battery-b-soc))        ; 12
-        (or (> stats-temp-battery 80.0)
-            (> stats-temp-esc 80.0)
-            (> stats-temp-motor 80.0))      ; 13
+        (> stats-temp-battery 80.0)         ; 13
+        (> stats-temp-motor 80.0)           ; 14
     ))
 )
 
@@ -43,7 +42,8 @@
     (img-blit buf-stripe-fg buf-stripe-top 0 0 -1)
 
     (def buf-warning-icon (img-buffer-from-bin icon-warning))
-    (def buf-over-temp-icon (img-buffer-from-bin icon-over-temp))
+    (def buf-hot-battery (img-buffer-from-bin icon-hot-battery))
+    (def buf-hot-motor (img-buffer-from-bin icon-hot-motor))
 
     (def buf-battery-a-sm (img-buffer 'indexed4 20 62))
     (def buf-battery-b-sm (img-buffer 'indexed4 20 62))
@@ -58,7 +58,7 @@
     (def buf-indicate-l-anim (img-buffer 'indexed4 62 18))
     (def buf-indicate-r-anim (img-buffer 'indexed4 62 18))
     (def buf-cruise-control (img-buffer-from-bin icon-cruise-control))
-    (def buf-cruise-speed (img-buffer 'indexed4 88 32))
+    (def buf-cruise-speed (img-buffer 'indexed4 65 32))
     (def buf-lights (img-buffer-from-bin icon-lights))
     (def buf-highbeam (img-buffer-from-bin icon-highbeam))
     (def buf-kickstand (img-buffer-from-bin icon-kickstand))
@@ -73,8 +73,9 @@
     (disp-render buf-lights 165 1 colors-green-icon)
     (disp-render buf-highbeam 104 1 colors-dim-icon)
     (disp-render buf-kickstand 270 116 colors-red-icon)
-    (disp-render buf-warning-icon 190 50 colors-dim-icon)
-    (disp-render buf-over-temp-icon 142 50 colors-dim-icon)
+    (disp-render buf-hot-motor 124 50 colors-dim-icon-16c)
+    (disp-render buf-warning-icon 167 50 colors-dim-icon)
+    (disp-render buf-hot-battery 215 50 colors-dim-icon-16c)
     (disp-render buf-neutral-mode 270 172 colors-green-icon)
 
     (if btn-3-pressed (spooky-light-glitch))
@@ -109,6 +110,8 @@
         'battery-a-charging
         'battery-b-charging
         'battery-b-soc
+        'hot-battery
+        'hot-motor
     ))
 
     (disp-render buf-stripe-bg 5 93 colors-stripes-16c)
@@ -399,11 +402,53 @@
         (disp-render buf-performance-mode 262 220 colors-white-icon)
     })
 
-    ; Over Temp Warning
+    ; Hot Battery
     (if (not-eq (ix view-state-now 13) (ix view-state-previous 13)) {
         (if (ix view-state-now 13)
-            (disp-render buf-over-temp-icon 142 50 colors-red-icon)
-            (disp-render buf-over-temp-icon 142 50 colors-dim-icon)
+            (disp-render buf-hot-battery 215 50 '(
+                0x0
+                0x350202
+                0x600000
+                0x7c0001
+                0x1e201d
+                0xa90000
+                0xd40000
+                0xef0003
+                0xfd0000
+                0x3f413e
+                0x7f817e
+                0x919390
+                0xa2a4a1
+                0xabadaa
+                0xb4b6b3
+                0xc7c9c6
+            ))
+            (disp-render buf-hot-battery 215 50 colors-dim-icon-16c)
+        )
+    })
+
+    ; Hot Motor
+    (if (not-eq (ix view-state-now 14) (ix view-state-previous 14)) {
+        (if (ix view-state-now 14)
+            (disp-render buf-hot-motor 124 50 '(
+                0x0
+                0x370002
+                0x4b0000
+                0x232522
+                0x720002
+                0xa30100
+                0xda0000
+                0xfd0000
+                0x494b49
+                0xb83c37
+                0x666865
+                0xb37577
+                0x848683
+                0xa4a4a1
+                0xb9b9b7
+                0xc9ccc8
+            ))
+            (disp-render buf-hot-motor 124 50 colors-dim-icon-16c)
         )
     })
 
@@ -423,11 +468,12 @@
         (ix view-state-now 11)
         (ix view-state-now 12)
         (ix view-state-now 13)
+        (ix view-state-now 14)
     ))
 
     ; Render Warning Icon
     (if (> (length stats-fault-codes-observed) 0) {
-        (disp-render buf-warning-icon 190 50 '(0x000000 0xff0000 0x929491 0xfbfcfc))
+        (disp-render buf-warning-icon 167 50 '(0x000000 0xff0000 0x929491 0xfbfcfc))
     })
 })
 

@@ -44,7 +44,8 @@
 (import "assets/neutral-4c.bin" 'icon-neutral)
 (import "assets/drive-4c.bin" 'icon-drive)
 (import "assets/charge-bolt-4c.bin" 'icon-charge-bolt)
-(import "assets/over-temp-4c.bin" 'icon-over-temp)
+(import "assets/hot-battery-16c.bin" 'icon-hot-battery)
+(import "assets/hot-motor-16c.bin" 'icon-hot-motor)
 
 (import "lib/vehicle-state.lisp" 'code-vehicle-state)
 (read-eval-program code-vehicle-state)

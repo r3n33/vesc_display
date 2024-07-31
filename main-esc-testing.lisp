@@ -55,7 +55,6 @@
 ))))
 
 ; TODO: Fake indicator signals, highbeam indicator, cruise control state
-(def send-msg-30 false)
 (spawn (fn () {
     ; Sending initial signal that would not have measured the Indicator Duration
     (bufset-u8 buf-canid30 0 1) ; L Indicator ON
@@ -64,13 +63,11 @@
     (bufset-u8 buf-canid30 4 0) ; Highbeam OFF
     (bufset-u8 buf-canid30 5 0) ; Cruise Control OFF
     (bufset-u16 buf-canid30 6 0) ; Cruise Control Speed
-    (setq send-msg-30 true)
     (sleep 0.65)
 
     (bufset-u8 buf-canid30 0 0) ; L Indicator OFF
     (bufset-u8 buf-canid30 1 0) ; R Indicator OFF
     (bufset-u16 buf-canid30 2 0) ; Indicator ON milliseconds
-    (setq send-msg-30 true)
     (sleep 0.5)
 
     (var highbeam-active false)
@@ -86,19 +83,17 @@
             })
 
             (bufset-u8 buf-canid30 0 1) ; L Indicator ON
-            (bufset-u8 buf-canid30 1 1) ; R Indicator ON
+            (bufset-u8 buf-canid30 1 (if highbeam-active 1 0)) ; R Indicator ON
             (bufset-u16 buf-canid30 2 650) ; Indicator ON milliseconds
             (if highbeam-active
                 (bufset-u8 buf-canid30 4 1)
                 (bufset-u8 buf-canid30 4 0)
             )
-            (setq send-msg-30 true)
             (sleep 0.65)
 
             (bufset-u8 buf-canid30 0 0) ; L Indicator OFF
-            (bufset-u8 buf-canid30 1 0) ; R Indicator OFF
+            (bufset-u8 buf-canid30 1 (if highbeam-active 0 0)) ; R Indicator OFF
             (bufset-u16 buf-canid30 2 650) ; Indicator ON milliseconds
-            (setq send-msg-30 true)
             (sleep 0.5)
 
             (setq highbeam-active (not highbeam-active))
@@ -150,12 +145,10 @@
         (can-send-sid 23 buf-canid23)
         (can-send-sid 24 buf-canid24)
 
+        (can-send-sid 30 buf-canid30)
+
         (bufset-i16 buf-canid31 5 (* (get-batt) 1000)) ; Battery B SOC
         (can-send-sid 31 buf-canid31)
 
-        (if send-msg-30 {
-            (can-send-sid 30 buf-canid30)
-            (setq send-msg-30 false)
-        })
         (sleep 0.1) ; 10 Hz
 ))))

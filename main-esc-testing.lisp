@@ -10,14 +10,29 @@
 
 (start-code-server)
 
+; ESC
+    ; 20 SOC, Duty, Speed, Current In
+    ; 21 BMS Temp, Mosfet Temp, Motor Temp, Pitch angle
+    ; 22 Wh, Wh Regen, Distance, Fault
+    ; 23 Current Avg, Current Max, Current Now, Batt Ah
+    ; 24 VIN
 (def buf-canid20 (array-create 8))
 (def buf-canid21 (array-create 8))
 (def buf-canid22 (array-create 8))
 (def buf-canid23 (array-create 8))
 (def buf-canid24 (array-create 8))
 
+; IO
+    ; 30 Indicators, High Beam, Cruise Control
+        ; TODO: Cruise Control state from ESC?
+        ; TODO: Cruise Control speed from ESC?
+    ; 31 Kickstand, Drive Mode, Performance Mode
 (def buf-canid30 (array-create 8))
 (def buf-canid31 (array-create 8))
+
+; BMS
+    ; 35 Battery A/B SOC, Battery A/B Charge Status
+(def buf-canid35 (array-create 8))
 
 @const-start
 
@@ -100,55 +115,64 @@
     ))
 }))
 
-; TODO: Fake kickstand, drive mode, performance mode, battery state
+; TODO: Fake kickstand, drive mode, performance mode
 (spawn (fn () (loopwhile t
     (progn
         ; Raise kickstand, leave in neutral
         (bufset-u8 buf-canid31 0 1) ; Kickstand Up
         (bufset-u8 buf-canid31 1 0) ; Drive Mode Inactive
         (bufset-u8 buf-canid31 2 0) ; Performance Mode ECO
-        (bufset-u8 buf-canid31 3 0) ; Battery A not Charging
-        (bufset-u8 buf-canid31 4 0) ; Battery B not Charging
-        (bufset-i16 buf-canid31 5 (* (get-batt) 1000)) ; Battery B SOC
         (sleep 3.0)
 
         ; Raise kickstand, Put in Drive Mode
         (bufset-u8 buf-canid31 0 1) ; Kickstand Up
         (bufset-u8 buf-canid31 1 1) ; Drive Mode Active
         (bufset-u8 buf-canid31 2 1) ; Performance Mode Normal
-        (bufset-u8 buf-canid31 3 0) ; Battery A not Charging
-        (bufset-u8 buf-canid31 4 0) ; Battery B not Charging
-        (bufset-i16 buf-canid31 5 (* (get-batt) 1000)) ; Battery B SOC
         (sleep 3.0)
 
         ; Lower kickstand, put in neutral
         (bufset-u8 buf-canid31 0 0) ; Kickstand Down
         (bufset-u8 buf-canid31 1 0) ; Drive Mode Inactive
         (bufset-u8 buf-canid31 2 2) ; Performance Mode Sport
-        (bufset-u8 buf-canid31 3 0) ; Battery A not Charging
-        (bufset-u8 buf-canid31 4 1) ; Battery B is Charging
-        (bufset-i16 buf-canid31 5 (* (get-batt) 1000)) ; Battery B SOC
         (sleep 3.0)
+))))
 
-        ; Swap Charging Battery
-        (bufset-u8 buf-canid31 3 1) ; Battery A is Charging
-        (bufset-u8 buf-canid31 4 0) ; Battery B not Charging
-        (sleep 3.0)
+; TODO: Fake Battery A/B SOC and charge status
+@const-end
+(def fake-charge-state 0)
+(def fake-charge-swap (systime))
+@const-start
+
+(spawn (fn () (loopwhile t
+    (progn
+        (bufset-i16 buf-canid35 0 (* (get-batt) 1000)) ; Battery A SOC
+        (bufset-i16 buf-canid35 2 (* (- 1.0 (get-batt)) 1000)) ; Battery B SOC
+        (bufset-u8 buf-canid35 4 fake-charge-state) ; Battery A Charging
+        (bufset-u8 buf-canid35 5 (if (eq fake-charge-state 1) 0 1)) ; Battery B Charging
+
+        (if (> (secs-since fake-charge-swap) 2.0) {
+            (setq fake-charge-state (if (eq fake-charge-state 1) 0 1))
+            (def fake-charge-swap (systime))
+        })
+        (sleep 0.1)
 ))))
 
 
 (spawn (fn () (loopwhile t
     (progn
+        ; ESC
         (can-send-sid 20 buf-canid20)
         (can-send-sid 21 buf-canid21)
         (can-send-sid 22 buf-canid22)
         (can-send-sid 23 buf-canid23)
         (can-send-sid 24 buf-canid24)
 
+        ; I/O Board
         (can-send-sid 30 buf-canid30)
-
-        (bufset-i16 buf-canid31 5 (* (get-batt) 1000)) ; Battery B SOC
         (can-send-sid 31 buf-canid31)
+
+        ; BMS
+        (can-send-sid 35 buf-canid35)
 
         (sleep 0.1) ; 10 Hz
 ))))

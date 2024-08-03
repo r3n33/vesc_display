@@ -96,13 +96,14 @@
                 'eco
             })
         ))
-
-        (def battery-a-charging (eq (bufget-u8 data 3) 1))
-        (def battery-b-charging (eq (bufget-u8 data 4) 1))
-
-        (def battery-b-soc (/ (bufget-i16 data 5) 1000.0))
     })
 
+    (if (= id 35) {
+        (def stats-battery-soc (/ (bufget-i16 data 0) 1000.0))
+        (def battery-b-soc (/ (bufget-i16 data 2) 1000.0))
+        (def battery-a-charging (eq (bufget-u8 data 4) 1))
+        (def battery-b-charging (eq (bufget-u8 data 5) 1))
+    })
     (free data)
 })
 

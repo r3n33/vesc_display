@@ -485,6 +485,8 @@
     (def buf-arrow-r nil)
     
     (def buf-warning-icon nil)
+    (def buf-hot-battery nil)
+    (def buf-hot-motor nil)
 
     (def buf-battery-a-sm nil)
     (def buf-battery-a-sm-soc nil)
@@ -494,4 +496,18 @@
 
     (def buf-speed nil)
     (def buf-units nil)
+
+    (def buf-blink-left nil)
+    (def buf-blink-right nil)
+    (def buf-indicate-l-anim nil)
+    (def buf-indicate-r-anim nil)
+    (def buf-cruise-control nil)
+    (def buf-cruise-speed nil)
+    (def buf-lights nil)
+    (def buf-highbeam nil)
+    (def buf-kickstand nil)
+    (def buf-neutral-mode nil)
+    (def buf-drive-mode nil)
+    (def buf-performance-mode nil)
+    (def buf-charge-bolt nil)
 })

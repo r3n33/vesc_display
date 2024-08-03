@@ -189,7 +189,7 @@
         (if (ix view-state-now 3) {
             (img-clear buf-speed)
             (draw-battery-horizontal buf-speed 18 0 130 27 bat-a-soc 1 1 4)
-            (draw-battery-horizontal buf-speed 18 47 130 27 bat-b-soc 1 1 4)
+            (draw-battery-horizontal buf-speed 18 47 130 27 bat-b-soc 1 1 5)
 
             (if (ix view-state-now 10) {
                 ; Battery A is Charging
@@ -367,12 +367,12 @@
         (var bat-a-color 0x7f9a0d)
         (var bat-b-color 0x7f9a0d)
         (if (< stats-battery-soc 0.5)
-            (setq bat-a-color (lerp-color 0xe72a62 0xffa500 (ease-in-out-quint (* stats-battery-soc 2))))
-            (setq bat-a-color (lerp-color 0xffa500 0x7f9a0d (ease-in-out-quint (* (- stats-battery-soc 0.5) 2))))
+            (setq bat-a-color (lerp-color 0xe70000 0xffff00 (ease-in-sine (* stats-battery-soc 2))))
+            (setq bat-a-color (lerp-color 0xffff00 0x00ff00 (ease-out-sine (* (- stats-battery-soc 0.5) 2))))
         )
         (if (< battery-b-soc 0.5)
-            (setq bat-b-color (lerp-color 0xe72a62 0xffa500 (ease-in-out-quint (* battery-b-soc 2))))
-            (setq bat-b-color (lerp-color 0xffa500 0x7f9a0d (ease-in-out-quint (* (- battery-b-soc 0.5) 2))))
+            (setq bat-b-color (lerp-color 0xe70000 0xffff00 (ease-in-sine (* battery-b-soc 2))))
+            (setq bat-b-color (lerp-color 0xffff00 0x00ff00 (ease-out-sine (* (- battery-b-soc 0.5) 2))))
         )
 
         (if (ix view-state-now 3)

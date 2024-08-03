@@ -189,7 +189,7 @@
         (if (ix view-state-now 3) {
             (img-clear buf-speed)
             (draw-battery-horizontal buf-speed 18 0 130 27 bat-a-soc 1 1 4)
-            (draw-battery-horizontal buf-speed 18 47 130 27 bat-a-soc 1 1 4)
+            (draw-battery-horizontal buf-speed 18 47 130 27 bat-b-soc 1 1 4)
 
             (if (ix view-state-now 10) {
                 ; Battery A is Charging

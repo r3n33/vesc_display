@@ -1,14 +1,16 @@
 @const-start
+(def pi 3.141592)
 
-(defun ease-in-out-sine (x)
-    (/ (- 1 (cos (* 3.14159 x))) 2)
+(defun ease-in-sine (x)
+    (/ (- 1 (cos (* x pi))) 2)
 )
 
-(defun ease-in-out-quint (x)
-    (if (< x 0.5)
-        (* 16 x x x x x)
-        (- 1 (/ (pow (+ (* -2.0 x) 2.0) 5) 2.0))
-    )
+(defun ease-out-sine (x)
+    (sin (/ (* x pi) 2))
+)
+
+(defun ease-in-out-sine (x)
+    (/ (- (cos (* x pi)) -1) 2)
 )
 
 ; Rotates a point around the origin in the clockwise direction. (note that the

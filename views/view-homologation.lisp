@@ -3,6 +3,10 @@
 
 @const-start
 
+(def stripe-animation-start nil) ; timestamp
+(def stripe-animation-direction nil) ; nil for hiding, true for showing
+(def stripe-animation-duration 0.42) ; seconds
+
 (defun update-state-now ()
     (def view-state-now (list
         stats-kmh                           ; 0
@@ -303,10 +307,6 @@
     ; Kickstand
     (if (not-eq (ix view-state-now 3) (ix view-state-previous 3)) {
         (if (ix view-state-now 3) {
-            ; Render Speed buffer containing Large Batteries
-            (disp-render buf-speed 0 130 colors-white-icon)
-            (disp-render buf-units 175 222 '(0x0 0x0 0x0 0x0)) ; Hide Speed Units
-
             ; Clear small batteries
             (disp-render buf-battery-a-sm 262 92 '(0x0 0x0 0x0 0x0))
             (disp-render buf-battery-a-sm-soc 262 40 '(0x0 0x0 0x0 0x0))
@@ -317,17 +317,69 @@
             (disp-render buf-kickstand 270 116 colors-red-icon)
 
             ; Hide Stripes
-            (disp-render buf-stripe-bg 5 93 '(0x0))
+            (def stripe-animation-direction nil)
+            (def stripe-animation-start (systime))
+            ; TODO: (rcode-run-noret 10 '(alert-descend))
         } {
             (disp-render buf-kickstand 270 116 '(0x0 0x0 0x0 0x0)) ; Hide kickstand
             (disp-render buf-units 175 222 colors-white-icon) ; Show Speed Units
 
             ; Show Stripes
-            (disp-render buf-stripe-bg 5 93 colors-stripes-16c)
+            (def stripe-animation-direction true)
+            (def stripe-animation-start (systime))
+            ; TODO: (rcode-run-noret 10 '(alert-ascend))
         })
 
         (setix view-state-previous 0 'update-speed)
         (setix view-state-previous 1 'update-battery-soc)
+    })
+
+    ; Stripes Show/Hide Animation
+    (loopwhile stripe-animation-start {
+        (var pct (clamp01 (/ (secs-since stripe-animation-start) stripe-animation-duration)))
+
+        (if stripe-animation-direction {
+            ; Showing stripes (grow up)
+            (disp-render buf-stripe-bg 5 93 (list
+                (img-color 'gradient_y (lerp-color 0x000000 (ix colors-stripes-16c 0)  (ease-in-sine pct)) (ix colors-stripes-16c 0)  147 0)
+                (img-color 'gradient_y (lerp-color 0x000000 (ix colors-stripes-16c 1)  (ease-in-sine pct)) (ix colors-stripes-16c 1)  147 0)
+                (img-color 'gradient_y (lerp-color 0x000000 (ix colors-stripes-16c 2)  (ease-in-sine pct)) (ix colors-stripes-16c 2)  147 0)
+                (img-color 'gradient_y (lerp-color 0x000000 (ix colors-stripes-16c 3)  (ease-in-sine pct)) (ix colors-stripes-16c 3)  147 0)
+                (img-color 'gradient_y (lerp-color 0x000000 (ix colors-stripes-16c 4)  (ease-in-sine pct)) (ix colors-stripes-16c 4)  147 0)
+                (img-color 'gradient_y (lerp-color 0x000000 (ix colors-stripes-16c 5)  (ease-in-sine pct)) (ix colors-stripes-16c 5)  147 0)
+                (img-color 'gradient_y (lerp-color 0x000000 (ix colors-stripes-16c 6)  (ease-in-sine pct)) (ix colors-stripes-16c 6)  147 0)
+                (img-color 'gradient_y (lerp-color 0x000000 (ix colors-stripes-16c 7)  (ease-in-sine pct)) (ix colors-stripes-16c 7)  147 0)
+                (img-color 'gradient_y (lerp-color 0x000000 (ix colors-stripes-16c 8)  (ease-in-sine pct)) (ix colors-stripes-16c 8)  147 0)
+                (img-color 'gradient_y (lerp-color 0x000000 (ix colors-stripes-16c 9)  (ease-in-sine pct)) (ix colors-stripes-16c 9)  147 0)
+                (img-color 'gradient_y (lerp-color 0x000000 (ix colors-stripes-16c 10) (ease-in-sine pct)) (ix colors-stripes-16c 10) 147 0)
+                (img-color 'gradient_y (lerp-color 0x000000 (ix colors-stripes-16c 11) (ease-in-sine pct)) (ix colors-stripes-16c 11) 147 0)
+                (img-color 'gradient_y (lerp-color 0x000000 (ix colors-stripes-16c 12) (ease-in-sine pct)) (ix colors-stripes-16c 12) 147 0)
+                (img-color 'gradient_y (lerp-color 0x000000 (ix colors-stripes-16c 13) (ease-in-sine pct)) (ix colors-stripes-16c 13) 147 0)
+                (img-color 'gradient_y (lerp-color 0x000000 (ix colors-stripes-16c 14) (ease-in-sine pct)) (ix colors-stripes-16c 14) 147 0)
+            ))
+        } {
+            ; Hiding stripes (grow down)
+            (disp-render buf-stripe-bg 5 93 (list
+                (img-color 'gradient_y 0x000000 (lerp-color (ix colors-stripes-16c 0)  0x000000 (ease-out-sine pct)) 147 0)
+                (img-color 'gradient_y 0x000000 (lerp-color (ix colors-stripes-16c 1)  0x000000 (ease-out-sine pct)) 147 0)
+                (img-color 'gradient_y 0x000000 (lerp-color (ix colors-stripes-16c 2)  0x000000 (ease-out-sine pct)) 147 0)
+                (img-color 'gradient_y 0x000000 (lerp-color (ix colors-stripes-16c 3)  0x000000 (ease-out-sine pct)) 147 0)
+                (img-color 'gradient_y 0x000000 (lerp-color (ix colors-stripes-16c 4)  0x000000 (ease-out-sine pct)) 147 0)
+                (img-color 'gradient_y 0x000000 (lerp-color (ix colors-stripes-16c 5)  0x000000 (ease-out-sine pct)) 147 0)
+                (img-color 'gradient_y 0x000000 (lerp-color (ix colors-stripes-16c 6)  0x000000 (ease-out-sine pct)) 147 0)
+                (img-color 'gradient_y 0x000000 (lerp-color (ix colors-stripes-16c 7)  0x000000 (ease-out-sine pct)) 147 0)
+                (img-color 'gradient_y 0x000000 (lerp-color (ix colors-stripes-16c 8)  0x000000 (ease-out-sine pct)) 147 0)
+                (img-color 'gradient_y 0x000000 (lerp-color (ix colors-stripes-16c 9)  0x000000 (ease-out-sine pct)) 147 0)
+                (img-color 'gradient_y 0x000000 (lerp-color (ix colors-stripes-16c 10) 0x000000 (ease-out-sine pct)) 147 0)
+                (img-color 'gradient_y 0x000000 (lerp-color (ix colors-stripes-16c 11) 0x000000 (ease-out-sine pct)) 147 0)
+                (img-color 'gradient_y 0x000000 (lerp-color (ix colors-stripes-16c 12) 0x000000 (ease-out-sine pct)) 147 0)
+                (img-color 'gradient_y 0x000000 (lerp-color (ix colors-stripes-16c 13) 0x000000 (ease-out-sine pct)) 147 0)
+                (img-color 'gradient_y 0x000000 (lerp-color (ix colors-stripes-16c 14) 0x000000 (ease-out-sine pct)) 147 0)
+            ))
+        })
+
+        ; Mark as complete
+        (if (>= pct 1.0) (def stripe-animation-start nil))
     })
 
     ; Speed Now

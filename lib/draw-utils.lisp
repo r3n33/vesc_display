@@ -7,23 +7,6 @@
     )
 )
 
-; linearly interpolate between a and b by v.
-; v is in range 0-1
-(defun lerp (a b v)
-    (+ (* (- 1 v) a) (* v b))
-)
-
-(defun lerp-color (a b v) {
-    (var a-rgb (color-split a))
-    (var b-rgb (color-split b))
-
-    (var r (to-i (lerp (ix a-rgb 0) (ix b-rgb 0) v)))
-    (var g (to-i (lerp (ix a-rgb 1) (ix b-rgb 1) v)))
-    (var b (to-i (lerp (ix a-rgb 2) (ix b-rgb 2) v)))
-
-    (color-make r g b)
-})
-
 ; Rotates a point around the origin in the clockwise direction. (note that the
 ; coordinate system is upside down). The returned position is a list containing
 ; the x and y coordinates. Angle is in degrees.

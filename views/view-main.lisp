@@ -200,8 +200,8 @@
     (if (not-eq (to-i (* 100 stats-battery-soc)) (second view-previous-stats)) {
         (var color 0x7f9a0d)
         (if (< stats-battery-soc 0.5)
-            (setq color (lerp-color 0xe72a62 0xffa500 (ease-in-out-quint (* stats-battery-soc 2))))
-            (setq color (lerp-color 0xffa500 0x7f9a0d (ease-in-out-quint (* (- stats-battery-soc 0.5) 2))))
+            (setq color (color-mix 0xe72a62 0xffa500 (ease-in-out-quint (* stats-battery-soc 2))))
+            (setq color (color-mix 0xffa500 0x7f9a0d (ease-in-out-quint (* (- stats-battery-soc 0.5) 2))))
         )
         (disp-render buf-battery 265 95 `(0x000000 0xfbfcfc ,color 0x0000ff))
         (disp-render buf-battery-soc 261 75 colors-text-aa)

@@ -5,7 +5,7 @@
 (def highbeam-on false)
 
 (def kickstand-down true)
-(def drive-mode-active false) ; True when taken out of Neutral
+(def drive-mode 'neutral) ; 'neutral 'drive 'reverse
 (def performance-mode 'eco) ; 'eco 'normal 'sport
 
 (def cruise-control-active false)

@@ -86,7 +86,15 @@
         })
         ((= id 31) {
             (def kickstand-down (eq (bufget-u8 data 0) 0)) ; NOTE: Inverted
-            (def drive-mode-active (eq (bufget-u8 data 1) 1))
+            (def drive-mode (match (bufget-u8 data 1)
+                (0 'neutral)
+                (1 'drive)
+                (2 'reverse)
+                (_ {
+                    (print "Error: Invalid drive mode")
+                    'neutral
+                })
+            ))
             (def performance-mode (match (bufget-u8 data 2)
                 (0 'eco)
                 (1 'normal)

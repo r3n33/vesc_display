@@ -118,21 +118,26 @@
 ; TODO: Fake kickstand, drive mode, performance mode
 (spawn (fn () (loopwhile t
     (progn
-        ; Raise kickstand, leave in neutral
+        ; Raise kickstand, put in neutral
         (bufset-u8 buf-canid31 0 1) ; Kickstand Up
-        (bufset-u8 buf-canid31 1 0) ; Drive Mode Inactive
+        (bufset-u8 buf-canid31 1 0) ; 'neutral
         (bufset-u8 buf-canid31 2 0) ; Performance Mode ECO
         (sleep 3.0)
 
-        ; Raise kickstand, Put in Drive Mode
+        ; Raise kickstand, Put in Drive
         (bufset-u8 buf-canid31 0 1) ; Kickstand Up
-        (bufset-u8 buf-canid31 1 1) ; Drive Mode Active
+        (bufset-u8 buf-canid31 1 1) ; 'drive
         (bufset-u8 buf-canid31 2 1) ; Performance Mode Normal
-        (sleep 3.0)
+        (sleep 2.0)
+
+        (bufset-u8 buf-canid31 1 2) ; 'reverse
+        (sleep 2.0)
+        (bufset-u8 buf-canid31 1 1) ; 'drive
+        (sleep 2.0)
 
         ; Lower kickstand, put in neutral
         (bufset-u8 buf-canid31 0 0) ; Kickstand Down
-        (bufset-u8 buf-canid31 1 0) ; Drive Mode Inactive
+        (bufset-u8 buf-canid31 1 0) ; 'neutral
         (bufset-u8 buf-canid31 2 2) ; Performance Mode Sport
         (sleep 3.0)
 ))))

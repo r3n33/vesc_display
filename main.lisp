@@ -43,6 +43,7 @@
 (import "assets/kickstand-4c.bin" 'icon-kickstand)
 (import "assets/neutral-4c.bin" 'icon-neutral)
 (import "assets/drive-4c.bin" 'icon-drive)
+(import "assets/reverse-4c.bin" 'icon-reverse)
 (import "assets/charge-bolt-4c.bin" 'icon-charge-bolt)
 (import "assets/hot-battery-16c.bin" 'icon-hot-battery)
 (import "assets/hot-motor-16c.bin" 'icon-hot-motor)

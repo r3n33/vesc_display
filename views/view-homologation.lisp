@@ -13,7 +13,7 @@
         (to-i (* 100 stats-battery-soc))    ; 1
         highbeam-on                         ; 2
         kickstand-down                      ; 3
-        drive-mode-active                   ; 4
+        drive-mode                          ; 4
         performance-mode                    ; 5
         indicate-l-on                       ; 6
         indicate-r-on                       ; 7
@@ -68,6 +68,7 @@
     (def buf-kickstand (img-buffer-from-bin icon-kickstand))
     (def buf-neutral-mode (img-buffer-from-bin icon-neutral))
     (def buf-drive-mode (img-buffer-from-bin icon-drive))
+    (def buf-reverse-mode (img-buffer-from-bin icon-reverse))
     (def buf-performance-mode (img-buffer 'indexed4 50 20))
     (def buf-charge-bolt (img-buffer-from-bin icon-charge-bolt))
 
@@ -443,9 +444,10 @@
 
     ; Drive Mode
     (if (not-eq (ix view-state-now 4) (ix view-state-previous 4)) {
-        (if (ix view-state-now 4)
-            (disp-render buf-drive-mode 270 172 colors-white-icon)
-            (disp-render buf-neutral-mode 270 172 colors-green-icon)
+        (match (ix view-state-now 4)
+           (neutral (disp-render buf-neutral-mode 270 172 colors-green-icon))
+           (drive (disp-render buf-drive-mode 270 172 colors-white-icon))
+           (reverse (disp-render buf-reverse-mode 270 172 colors-white-icon))
         )
     })
 
@@ -560,6 +562,7 @@
     (def buf-kickstand nil)
     (def buf-neutral-mode nil)
     (def buf-drive-mode nil)
+    (def buf-reverse-mode nil)
     (def buf-performance-mode nil)
     (def buf-charge-bolt nil)
 })

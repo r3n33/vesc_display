@@ -2,6 +2,7 @@
 (def indicate-l-on nil)
 (def indicate-r-on nil)
 (def indicate-ms 0)
+(def indicator-timestamp 0)
 (def highbeam-on false)
 
 (def kickstand-down true)

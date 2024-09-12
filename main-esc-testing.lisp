@@ -142,10 +142,11 @@
         (sleep 3.0)
 ))))
 
-; TODO: Fake Battery A/B SOC and charge status
+; Fake Battery A/B SOC and charge status
 @const-end
 (def fake-charge-state 0)
 (def fake-charge-swap (systime))
+(def fake-battery-b-connected true)
 @const-start
 
 (spawn (fn () (loopwhile t
@@ -154,6 +155,7 @@
         (bufset-i16 buf-canid35 2 (* (- 1.0 (get-batt)) 1000)) ; Battery B SOC
         (bufset-u8 buf-canid35 4 fake-charge-state) ; Battery A Charging
         (bufset-u8 buf-canid35 5 (if (eq fake-charge-state 1) 0 1)) ; Battery B Charging
+        (bufset-u8 buf-canid35 6 (if fake-battery-b-connected 1 0))
 
         (if (> (secs-since fake-charge-swap) 2.0) {
             (setq fake-charge-state (if (eq fake-charge-state 1) 0 1))

@@ -112,6 +112,7 @@
             (def battery-b-soc (/ (bufget-i16 data 2) 1000.0))
             (def battery-a-charging (eq (bufget-u8 data 4) 1))
             (def battery-b-charging (eq (bufget-u8 data 5) 1))
+            (def battery-b-connected (eq (bufget-u8 data 6) 1))
 
             (setq rx-cnt-can (+ rx-cnt-can 1))
         })

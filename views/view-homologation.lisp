@@ -24,6 +24,7 @@
         (to-i (* 100 battery-b-soc))        ; 12
         (> stats-temp-battery 80.0)         ; 13
         (> stats-temp-motor 80.0)           ; 14
+        battery-b-connected                 ; 15
     ))
 )
 
@@ -168,6 +169,7 @@
         (not-eq (ix view-state-now 10) (ix view-state-previous 10))
         (not-eq (ix view-state-now 11) (ix view-state-previous 11))
         (not-eq (ix view-state-now 12) (ix view-state-previous 12))
+        (not-eq (ix view-state-now 15) (ix view-state-previous 15))
     ) {
         ; Update Battery %
         (img-clear buf-battery-a-sm)
@@ -186,15 +188,23 @@
         (txt-block-v buf-battery-a-sm-soc (list 0 1 2 3) 0 0 (first (img-dims buf-battery-a-sm-soc)) (second (img-dims buf-battery-a-sm-soc)) font15 (str-merge "%" (str-from-n bat-a-soc-i "%d")))
 
         ; Battery B Value
-        (draw-battery-vertical buf-battery-b-sm (first (img-dims buf-battery-b-sm)) (second (img-dims buf-battery-b-sm)) bat-b-soc 1)
-        (img-clear buf-battery-b-sm-soc)
-        (txt-block-v buf-battery-b-sm-soc (list 0 1 2 3) 0 0 (first (img-dims buf-battery-b-sm-soc)) (second (img-dims buf-battery-b-sm-soc)) font15 (str-merge "%" (str-from-n bat-b-soc-i "%d")))
+        (if (ix view-state-now 15) {
+            ; Battery B is connected
+            (draw-battery-vertical buf-battery-b-sm (first (img-dims buf-battery-b-sm)) (second (img-dims buf-battery-b-sm)) bat-b-soc 1)
+            (img-clear buf-battery-b-sm-soc)
+            (txt-block-v buf-battery-b-sm-soc (list 0 1 2 3) 0 0 (first (img-dims buf-battery-b-sm-soc)) (second (img-dims buf-battery-b-sm-soc)) font15 (str-merge "%" (str-from-n bat-b-soc-i "%d")))
+        } {
+            (img-clear buf-battery-b-sm)
+            (img-clear buf-battery-b-sm-soc)
+        })
 
         ; Large batteries
         (if (ix view-state-now 3) {
             (img-clear buf-speed)
             (draw-battery-horizontal buf-speed 18 0 130 27 bat-a-soc 1 1 4)
-            (draw-battery-horizontal buf-speed 18 47 130 27 bat-b-soc 1 1 5)
+            (if (ix view-state-now 15)
+                (draw-battery-horizontal buf-speed 18 47 130 27 bat-b-soc 1 1 5)
+            )
 
             (if (ix view-state-now 10) {
                 ; Battery A is Charging
@@ -203,16 +213,19 @@
                 (if (< bat-a-soc-i 100) (txt-block-r buf-speed '(0 1 2 3) 160 28 font18 (str-merge "2h10m")))
             })
 
-            (if (ix view-state-now 11) {
-                ; Battery B is Charging
-                (img-blit buf-speed buf-charge-bolt 55 51 0)
-                ; TODO: Provide charge time estimate
-                (if (< bat-b-soc-i 100) (txt-block-r buf-speed '(0 1 2 3) 160 74 font18 (str-merge "1h28m")))
+            (if (and
+                    (ix view-state-now 11) ; Battery B charging
+                    (ix view-state-now 15) ; Battery B connected
+                ) {
+                    ; Battery B is Charging
+                    (img-blit buf-speed buf-charge-bolt 55 51 0)
+                    ; TODO: Provide charge time estimate
+                    (if (< bat-b-soc-i 100) (txt-block-r buf-speed '(0 1 2 3) 160 74 font18 (str-merge "1h28m")))
             })
 
             ; SOC
             (txt-block-l buf-speed '(0 1 2 3) 20 28 font18 (str-merge (str-from-n bat-a-soc-i "%d") "%"))
-            (txt-block-l buf-speed '(0 1 2 3) 20 74 font18 (str-merge (str-from-n bat-b-soc-i "%d") "%"))
+            (if (ix view-state-now 15) (txt-block-l buf-speed '(0 1 2 3) 20 74 font18 (str-merge (str-from-n bat-b-soc-i "%d") "%")))
         })
     })
 
@@ -416,6 +429,7 @@
         (not-eq (ix view-state-now 10) (ix view-state-previous 10))
         (not-eq (ix view-state-now 11) (ix view-state-previous 11))
         (not-eq (ix view-state-now 12) (ix view-state-previous 12))
+        (not-eq (ix view-state-now 15) (ix view-state-previous 15))
     ) {
         (var bat-a-color 0x7f9a0d)
         (var bat-b-color 0x7f9a0d)
@@ -523,6 +537,7 @@
         (ix view-state-now 12)
         (ix view-state-now 13)
         (ix view-state-now 14)
+        (ix view-state-now 15)
     ))
 
     ; Render Warning Icon

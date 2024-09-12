@@ -13,5 +13,6 @@
 (def cruise-control-speed 0.0)
 
 (def battery-a-charging false)
+(def battery-b-connected false)
 (def battery-b-charging false)
 (def battery-b-soc 0.0)

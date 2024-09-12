@@ -183,12 +183,12 @@
         ; Battery A
         (draw-battery-vertical buf-battery-a-sm (first (img-dims buf-battery-a-sm)) (second (img-dims buf-battery-a-sm)) bat-a-soc 1)
         (img-clear buf-battery-a-sm-soc)
-        (txt-block-v buf-battery-a-sm-soc (list 0 1 2 3) (first (img-dims buf-battery-a-sm-soc)) (second (img-dims buf-battery-a-sm-soc)) font15 (str-merge "%" (str-from-n bat-a-soc-i "%d")))
+        (txt-block-v buf-battery-a-sm-soc (list 0 1 2 3) 0 0 (first (img-dims buf-battery-a-sm-soc)) (second (img-dims buf-battery-a-sm-soc)) font15 (str-merge "%" (str-from-n bat-a-soc-i "%d")))
 
         ; Battery B Value
         (draw-battery-vertical buf-battery-b-sm (first (img-dims buf-battery-b-sm)) (second (img-dims buf-battery-b-sm)) bat-b-soc 1)
         (img-clear buf-battery-b-sm-soc)
-        (txt-block-v buf-battery-b-sm-soc (list 0 1 2 3) (first (img-dims buf-battery-b-sm-soc)) (second (img-dims buf-battery-b-sm-soc)) font15 (str-merge "%" (str-from-n bat-b-soc-i "%d")))
+        (txt-block-v buf-battery-b-sm-soc (list 0 1 2 3) 0 0 (first (img-dims buf-battery-b-sm-soc)) (second (img-dims buf-battery-b-sm-soc)) font15 (str-merge "%" (str-from-n bat-b-soc-i "%d")))
 
         ; Large batteries
         (if (ix view-state-now 3) {

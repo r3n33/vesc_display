@@ -81,11 +81,11 @@
     })
 })
 
-(defun txt-block-v (img col w h font txt) {
+(defun txt-block-v (img col x y w h font txt) {
     (var buf-temp (img-buffer 'indexed4 h w)) ; Create rotated buffer for img-blit
-    (txt-block-l buf-temp col 0 0 font txt)
+    (txt-block-c buf-temp col (/ h 2) 0 font txt)
 
-    (img-blit img buf-temp w 0 -1 '(rotate 0 0 -90))
+    (img-blit img buf-temp (+ w x) y -1 '(rotate 0 0 -90))
 })
 
 (defun draw-battery-horizontal (img x y w h soc line-w color-bg color-fg) {

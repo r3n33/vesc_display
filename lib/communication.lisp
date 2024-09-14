@@ -59,17 +59,16 @@
         })
         ((= id 24) {
             (def stats-vin (/ (bufget-u16 data 0) 10.0))
+            (def stats-odom (/ (bufget-u16 data 2) 10.0))
+            (def cruise-control-speed (/ (bufget-u16 data 4) 10.0))
             (setq rx-cnt-can (+ rx-cnt-can 1))
         })
         ((= id 30) {
             (var indicate-l (eq (bufget-u8 data 0) 1))
             (var indicate-r (eq (bufget-u8 data 1) 1))
             (def indicate-ms (bufget-u16 data 2))
-
             (def highbeam-on (eq (bufget-u8 data 4) 1))
-
             (def cruise-control-active (eq (bufget-u8 data 5) 1))
-            (def cruise-control-speed (/ (bufget-u16 data 6) 10.0))
 
             ; Track when indicators activate for animation
             (if (or

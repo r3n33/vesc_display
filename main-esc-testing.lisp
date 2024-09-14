@@ -10,12 +10,17 @@
 
 (start-code-server)
 
+; NOTE: ADC App? Cruise control test?
+;(app-adc-detach 2 1) ; Give LBM control over CC button
+;(app-adc-override 3 1) ; Activate CC
+;(app-adc-override 3 0) ; Deactivate CC
+
 ; ESC
     ; 20 SOC, Duty, Speed, Current In
     ; 21 BMS Temp, Mosfet Temp, Motor Temp, Pitch angle
     ; 22 Wh, Wh Regen, Distance, Fault
     ; 23 Current Avg, Current Max, Current Now, Batt Ah
-    ; 24 VIN
+    ; 24 VIN, Odometer, Cruise Control Set Speed
 (def buf-canid20 (array-create 8))
 (def buf-canid21 (array-create 8))
 (def buf-canid22 (array-create 8))
@@ -23,9 +28,7 @@
 (def buf-canid24 (array-create 8))
 
 ; IO
-    ; 30 Indicators, High Beam, Cruise Control
-        ; TODO: Cruise Control state from ESC?
-        ; TODO: Cruise Control speed from ESC?
+    ; 30 Indicators, High Beam, Cruise Control Active
     ; 31 Kickstand, Drive Mode, Performance Mode
 (def buf-canid30 (array-create 8))
 (def buf-canid31 (array-create 8))
@@ -55,7 +58,7 @@
 
                 (bufset-u16 buf-canid22 0 (* (get-wh) 10.0))
                 (bufset-u16 buf-canid22 2 (* (get-wh-chg) 10.0))
-                (bufset-u16 buf-canid22 4 (* (/ (get-dist-abs) 1000) 10))
+                (bufset-u16 buf-canid22 4 (* (/ (get-dist-abs) 1000.0) 10))
                 (bufset-u16 buf-canid22 6 (get-fault))
 
                 (bufset-u16 buf-canid23 0 (to-i (stats 'stat-current-avg)))
@@ -64,7 +67,8 @@
                 (bufset-u16 buf-canid23 6 (to-i (conf-get 'si-battery-ah)))
 
                 (bufset-u16 buf-canid24 0 (* (get-vin) 10))
-
+                (bufset-u16 buf-canid24 2 (* (/ (sysinfo 'odometer) 1000.0) 10))
+                (bufset-u16 buf-canid24 4 (* (abs (get-speed-set)) 3.6 10))
 
                 (sleep 0.1) ; 10 Hz
 ))))
@@ -91,10 +95,8 @@
         (progn
             (if highbeam-active {
                 (bufset-u8 buf-canid30 5 0) ; Cruise Control OFF
-                (bufset-u16 buf-canid30 6 (* 11.176 3.6 10)) ; Cruise Control Speed 25mph
             } {
                 (bufset-u8 buf-canid30 5 1) ; Cruise Control ON
-                (bufset-u16 buf-canid30 6 (* 28.6111 3.6 10)) ; Cruise Control Speed 103kph
             })
 
             (bufset-u8 buf-canid30 0 1) ; L Indicator ON

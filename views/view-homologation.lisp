@@ -25,6 +25,7 @@
         (> stats-temp-battery 80.0)         ; 13
         (> stats-temp-motor 80.0)           ; 14
         battery-b-connected                 ; 15
+        (to-i (* stats-odom 10))            ; 16
     ))
 )
 
@@ -72,6 +73,7 @@
     (def buf-reverse-mode (img-buffer-from-bin icon-reverse))
     (def buf-performance-mode (img-buffer 'indexed4 50 20))
     (def buf-charge-bolt (img-buffer-from-bin icon-charge-bolt))
+    (def buf-odom (img-buffer 'indexed4 140 15))
 
     (disp-render buf-blink-left 1 1 colors-dim-icon)
     (disp-render buf-blink-right (- 319 (first (img-dims buf-blink-right))) 1 colors-dim-icon)
@@ -118,6 +120,8 @@
         'battery-b-soc
         'hot-battery
         'hot-motor
+        'battery-b-connected
+        'stats-odom
     ))
 
     (disp-render buf-stripe-bg 5 93 colors-stripes-16c)
@@ -132,6 +136,7 @@
     (if (not-eq (ix view-state-now 3) (ix view-state-previous 3)) {
         (setix view-state-previous 0 'update-speed)
         (setix view-state-previous 1 'update-battery-soc)
+        (setix view-state-previous 16 'update-odom)
     })
 
     ; Draw Speed
@@ -170,6 +175,7 @@
         (not-eq (ix view-state-now 11) (ix view-state-previous 11))
         (not-eq (ix view-state-now 12) (ix view-state-previous 12))
         (not-eq (ix view-state-now 15) (ix view-state-previous 15))
+        (not-eq (ix view-state-now 16) (ix view-state-previous 16))
     ) {
         ; Update Battery %
         (img-clear buf-battery-a-sm)
@@ -266,6 +272,16 @@
         ))
         (txt-block-l buf-cruise-speed (list 0 1 2 3) 0 0 font32 (str-from-n (to-float cruise-speed) "%.0f"))
     })
+
+    ; Draw odometer
+    (if (not-eq (ix view-state-now 16) (ix view-state-previous 16)) {
+        (img-clear buf-odom)
+        (var odom (match (car settings-units-speeds)
+            (kmh (str-merge (str-from-n (* (ix view-state-now 16) 0.1) "%0.1f") "km"))
+            (mph (str-merge (str-from-n (* (ix view-state-now 16) km-to-mi 0.1) "%0.1f") "mi"))
+        ))
+        (txt-block-c buf-odom (list 0 1 2 3) (/ (first (img-dims buf-odom)) 2) 0 font15 odom)
+    })
 })
 
 (defun view-render-homologation () {
@@ -346,6 +362,7 @@
 
         (setix view-state-previous 0 'update-speed)
         (setix view-state-previous 1 'update-battery-soc)
+        (setix view-state-previous 16 'update-odom)
     })
 
     ; Stripes Show/Hide Animation
@@ -399,7 +416,7 @@
     ; Speed Now
     (if (not (ix view-state-now 3))
         (if (not-eq (ix view-state-now 0) (first view-state-previous)) {
-            (disp-render buf-speed 0 130 colors-white-icon)
+            (disp-render buf-speed 0 125 colors-white-icon)
             (disp-render buf-units 175 222 colors-white-icon)
 
             (disp-render buf-stripe-fg 5 93
@@ -430,6 +447,7 @@
         (not-eq (ix view-state-now 11) (ix view-state-previous 11))
         (not-eq (ix view-state-now 12) (ix view-state-previous 12))
         (not-eq (ix view-state-now 15) (ix view-state-previous 15))
+        (not-eq (ix view-state-now 16) (ix view-state-previous 16))
     ) {
         (var bat-a-color 0x7f9a0d)
         (var bat-b-color 0x7f9a0d)
@@ -520,6 +538,11 @@
         )
     })
 
+    ; Render Odometer
+    (if (not-eq (ix view-state-now 16) (ix view-state-previous 16))
+        (disp-render buf-odom 20 222 colors-white-icon)
+    )
+
     ; Update stats for improved performance
     (def view-state-previous (list
         (ix view-state-now 0)
@@ -538,6 +561,7 @@
         (ix view-state-now 13)
         (ix view-state-now 14)
         (ix view-state-now 15)
+        (ix view-state-now 16)
     ))
 
     ; Render Warning Icon
@@ -580,4 +604,5 @@
     (def buf-reverse-mode nil)
     (def buf-performance-mode nil)
     (def buf-charge-bolt nil)
+    (def buf-odom nil)
 })

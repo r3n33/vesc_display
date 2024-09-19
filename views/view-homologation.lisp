@@ -321,7 +321,7 @@
     })
 
     ; Cruise Control
-    (if (not-eq (ix view-state-now 8) (ix view-state-previous 8)) {
+    (if (or (not-eq (ix view-state-now 8) (ix view-state-previous 8)) (not-eq (ix view-state-now 9) (ix view-state-previous 9))) {
         ; Clear speed units from previous position
         (if (ix view-state-now 8) {
             (disp-render buf-cruise-control 10 44 colors-green-icon)

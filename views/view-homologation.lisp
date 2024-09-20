@@ -144,19 +144,31 @@
         (setix view-state-previous 16 'update-odom)
     })
 
-    ; Draw Speed
+    ; Ensure re-draw when changing drive mode
+    (if (not-eq (ix view-state-now 4) (ix view-state-previous 4)) {
+        (setix view-state-previous 0 'update-speed)
+    })
+
+    ; Draw Speed or Large Batteries
     (if (not-eq (ix view-state-now 0) (first view-state-previous)) {
-        ; Update Speed
+        ; Draw Speed Units
         (img-clear buf-units)
         (draw-units buf-units 0 0 (list 0 1 2 3) font15)
 
         (img-clear buf-speed)
-        (var speed-now (match (car settings-units-speeds)
-            (kmh (ix view-state-now 0))
-            (mph (* (ix view-state-now 0) km-to-mi))
-            (_ (print "Unexpected settings-units-speeds value"))
-        ))
-        (txt-block-c buf-speed (list 0 1 2 3) 87 0 font88 (str-from-n speed-now "%0.0f"))
+        (if (eq (ix view-state-now 4) 'neutral) {
+            ; Draw Press to Start
+            (img-blit buf-speed buf-start-motor 20 10 -1)
+            (img-blit buf-speed buf-start-msg (+ (first (img-dims buf-start-motor)) 25) 10 -1)
+        } {
+            ; Draw Speed
+            (var speed-now (match (car settings-units-speeds)
+                (kmh (ix view-state-now 0))
+                (mph (* (ix view-state-now 0) km-to-mi))
+                (_ (print "Unexpected settings-units-speeds value"))
+            ))
+            (txt-block-c buf-speed (list 0 1 2 3) 87 0 font88 (str-from-n speed-now "%0.0f"))
+        })
 
         ; Update Speed Arrow
         (var arrow-x-max (- 141 24))

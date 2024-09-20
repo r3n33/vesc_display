@@ -47,6 +47,9 @@
 (import "assets/charge-bolt-4c.bin" 'icon-charge-bolt)
 (import "assets/hot-battery-16c.bin" 'icon-hot-battery)
 (import "assets/hot-motor-16c.bin" 'icon-hot-motor)
+(import "assets/low-beam-4c.bin" 'icon-lowbeam)
+(import "assets/press-to-start-4c.bin" 'icon-start-msg)
+(import "assets/motor-start-4c.bin" 'icon-start-motor)
 
 (import "lib/vehicle-state.lisp" 'code-vehicle-state)
 (read-eval-program code-vehicle-state)

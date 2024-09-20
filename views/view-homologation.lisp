@@ -74,12 +74,17 @@
     (def buf-performance-mode (img-buffer 'indexed4 50 20))
     (def buf-charge-bolt (img-buffer-from-bin icon-charge-bolt))
     (def buf-odom (img-buffer 'indexed4 140 15))
+    (def buf-high-low-beam (img-buffer 'indexed4 55 39))
+    (def buf-lowbeam (img-buffer-from-bin icon-lowbeam))
+    (def buf-start-motor (img-buffer-from-bin icon-start-motor))
+    (def buf-start-msg (img-buffer-from-bin icon-start-msg))
 
     (disp-render buf-blink-left 1 1 colors-dim-icon)
     (disp-render buf-blink-right (- 319 (first (img-dims buf-blink-right))) 1 colors-dim-icon)
     (disp-render buf-cruise-control 10 44 colors-dim-icon)
     (disp-render buf-lights 165 1 colors-green-icon)
-    (disp-render buf-highbeam 104 1 colors-dim-icon)
+    (img-blit buf-high-low-beam buf-lowbeam 0 0 -1)
+    (disp-render buf-high-low-beam 104 1 colors-green-icon)
     (disp-render buf-kickstand 270 116 colors-red-icon)
     (disp-render buf-hot-motor 124 50 colors-dim-icon-16c)
     (disp-render buf-warning-icon 167 50 colors-dim-icon)
@@ -253,6 +258,15 @@
         (if (not (ix view-state-now 7)) (draw-turn-animation buf-indicate-r-anim 'right 1.0))
     })
 
+    ; Highbeam
+    (if (not-eq (ix view-state-now 2) (third view-state-previous)) {
+        (img-clear buf-high-low-beam)
+        (if (ix view-state-now 2)
+            (img-blit buf-high-low-beam buf-highbeam 0 0 -1)
+            (img-blit buf-high-low-beam buf-lowbeam 0 0 -1)
+        )
+    })
+
     ; Performance Mode
     (if (not-eq (ix view-state-now 5) (ix view-state-previous 5)) {
         (match (ix view-state-now 5)
@@ -315,8 +329,8 @@
     ; Highbeam
     (if (not-eq (ix view-state-now 2) (third view-state-previous)) {
         (if (ix view-state-now 2)
-            (disp-render buf-highbeam 104 1 colors-blue-icon)
-            (disp-render buf-highbeam 104 1 colors-dim-icon)
+            (disp-render buf-high-low-beam 104 1 colors-blue-icon)
+            (disp-render buf-high-low-beam 104 1 colors-green-icon)
         )
     })
 
@@ -605,4 +619,8 @@
     (def buf-performance-mode nil)
     (def buf-charge-bolt nil)
     (def buf-odom nil)
+    (def buf-high-low-beam nil)
+    (def buf-lowbeam nil)
+    (def buf-start-motor nil)
+    (def buf-start-msg nil)
 })

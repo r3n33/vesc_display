@@ -208,14 +208,14 @@
         ; Battery A
         (draw-battery-vertical buf-battery-a-sm (first (img-dims buf-battery-a-sm)) (second (img-dims buf-battery-a-sm)) bat-a-soc 1)
         (img-clear buf-battery-a-sm-soc)
-        (txt-block-v buf-battery-a-sm-soc (list 0 1 2 3) 0 0 (first (img-dims buf-battery-a-sm-soc)) (second (img-dims buf-battery-a-sm-soc)) font15 (str-merge "%" (str-from-n bat-a-soc-i "%d")))
+        (txt-block-v buf-battery-a-sm-soc (list 0 1 2 3) -1 0 0 (first (img-dims buf-battery-a-sm-soc)) (second (img-dims buf-battery-a-sm-soc)) font15 (str-merge "%" (str-from-n bat-a-soc-i "%d")))
 
         ; Battery B Value
         (if (ix view-state-now 15) {
             ; Battery B is connected
             (draw-battery-vertical buf-battery-b-sm (first (img-dims buf-battery-b-sm)) (second (img-dims buf-battery-b-sm)) bat-b-soc 1)
             (img-clear buf-battery-b-sm-soc)
-            (txt-block-v buf-battery-b-sm-soc (list 0 1 2 3) 0 0 (first (img-dims buf-battery-b-sm-soc)) (second (img-dims buf-battery-b-sm-soc)) font15 (str-merge "%" (str-from-n bat-b-soc-i "%d")))
+            (txt-block-v buf-battery-b-sm-soc (list 0 1 2 3) -1 0 0 (first (img-dims buf-battery-b-sm-soc)) (second (img-dims buf-battery-b-sm-soc)) font15 (str-merge "%" (str-from-n bat-b-soc-i "%d")))
         } {
             (img-clear buf-battery-b-sm)
             (img-clear buf-battery-b-sm-soc)
@@ -375,7 +375,7 @@
             ; Hide Stripes
             (def stripe-animation-direction nil)
             (def stripe-animation-start (systime))
-            ; TODO: (rcode-run-noret 10 '(alert-descend))
+            ; TODO: (rcode-run-noret config-can-id-esc '(alert-descend))
         } {
             (disp-render buf-kickstand 270 116 '(0x0 0x0 0x0 0x0)) ; Hide kickstand
             (disp-render buf-units 175 222 colors-white-icon) ; Show Speed Units
@@ -383,7 +383,7 @@
             ; Show Stripes
             (def stripe-animation-direction true)
             (def stripe-animation-start (systime))
-            ; TODO: (rcode-run-noret 10 '(alert-ascend))
+            ; TODO: (rcode-run-noret config-can-id-esc '(alert-ascend))
         })
 
         (setix view-state-previous 0 'update-speed)

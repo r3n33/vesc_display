@@ -1,6 +1,13 @@
 @const-start
 (def pi 3.141592)
 
+(defun ease-in-out-quint (x)
+    (if (< x 0.5)
+        (* 16 x x x x x)
+        (- 1 (/ (pow (+ (* -2.0 x) 2.0) 5) 2.0))
+    )
+)
+
 (defun ease-in-sine (x)
     (/ (- 1 (cos (* x pi))) 2)
 )
@@ -81,11 +88,13 @@
     })
 })
 
-(defun txt-block-v (img col x y w h font txt) {
+(defun txt-block-v (img col tc x y w h font txt) {
     (var buf-temp (img-buffer 'indexed4 h w)) ; Create rotated buffer for img-blit
+    (img-clear buf-temp (first col))
+
     (txt-block-c buf-temp col (/ h 2) 0 font txt)
 
-    (img-blit img buf-temp (+ w x) y -1 '(rotate 0 0 -90))
+    (img-blit img buf-temp (+ w x) y tc '(rotate 0 0 -90))
 })
 
 (defun draw-battery-horizontal (img x y w h soc line-w color-bg color-fg) {
@@ -135,16 +144,19 @@
 })
 
 (defun draw-vertical-bar (img x y w h colors pct) {
+    (var rounding (if (ix (rest-args) 0) (ix (rest-args) 0) 0))
+    (var with-outline (ix (rest-args) 1))
+    (var invert-direction (ix (rest-args) 2))
     (if (< pct 0.0) (setq pct 0.0))
     (if (> pct 1.0) (setq pct 1.0))
 
     ; Fill
     (def fill-h (floor (* (- h 2) pct)))
     (if (< fill-h 25) (setq fill-h 25))
-    (img-rectangle img (+ x 1) (+ y (- h fill-h) -1) (- w 2) fill-h (second colors) '(filled) '(rounded 10))
+    (img-rectangle img (+ x 1) (+ y (if invert-direction 0 (- h fill-h)) -1) (- w 2) fill-h (second colors) '(filled) `(rounded ,rounding))
 
     ; Outline
-    (img-rectangle img x y w h (first colors) '(thickness 4) '(rounded 10))
+    (if with-outline (img-rectangle img x y w h (first colors) '(thickness 4) `(rounded ,rounding)))
 })
 
 (defun draw-units (img x y color font) {

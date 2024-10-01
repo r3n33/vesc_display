@@ -81,7 +81,7 @@
             (1i32 (read-setting 'pf2-speed))
             (_ (read-setting 'pf3-speed))
         ))
-        (draw-vertical-bar buf-profile-speed 20 15 44 120 '(1 3) (map-range-01 speeds-active 0.0 speeds-max))
+        (draw-vertical-bar buf-profile-speed 20 15 44 120 '(1 3) (map-range-01 speeds-active 0.0 speeds-max) 10 true)
 
         (txt-block-l buf-profile-speed
             '(0 1 2 3)
@@ -107,7 +107,7 @@
             (0i32 (read-setting 'pf1-brake))
             (1i32 (read-setting 'pf2-brake))
             (_ (read-setting 'pf3-brake))
-        ))
+        ) 10 true)
 
         (txt-block-c buf-profile-brake
             '(0 1 2 3)
@@ -121,7 +121,7 @@
             (0i32 (read-setting 'pf1-accel))
             (1i32 (read-setting 'pf2-accel))
             (_ (read-setting 'pf3-accel))
-        ))
+        ) 10 true)
 
         (txt-block-r buf-profile-accel
             '(0 1 2 3)

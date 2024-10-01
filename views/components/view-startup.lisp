@@ -30,8 +30,8 @@
     (var logo-h (second (img-dims logo)))
 
     ; Play startup tone when ESC is ready
-    (wait-for-esc)
-    (rcode-run-noret 10 '(alert-startup))
+    ;(wait-for-esc)
+    ;(rcode-run-noret config-can-id-esc '(alert-startup))
 
     ; First stripe
     (disp-render logo (- 160 (/ logo-w 2)) (- 120 (/ logo-h 2))

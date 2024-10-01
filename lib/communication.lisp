@@ -3,7 +3,7 @@
 @const-start
 
 (defun esc-request (code) {
-    (var ret (rcode-run 10 0.2 code))
+    (var ret (rcode-run config-can-id-esc 0.2 code))
     (if (eq 'timeout ret) {
         (print "esc-request: timeout")
         nil

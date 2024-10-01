@@ -11,16 +11,17 @@
     (defun on-btn-1-pressed () {
         (stats-reset-max)
     })
-    (defun on-btn-2-pressed () {
+    (defun on-btn-2-pressed () (if (not config-units-switching-enable) nil
+    {
         (setting-units-cycle)
         (def view-previous-stats (list 'stats-kmh 'stats-kmh-max))
-    })
+    }))
     (defun on-btn-3-pressed () (def state-view-next (next-view)))
 
     (def view-changed nil)
     (def view-previous-stats (list 'stats-kmh 'stats-kmh-max))
 
-    (view-draw-menu 'arrow-left "RESET" "UNITS" 'arrow-right)
+    (view-draw-menu 'arrow-left "RESET" (if (not config-units-switching-enable) nil "UNITS") 'arrow-right)
     (view-render-menu)
 })
 

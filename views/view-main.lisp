@@ -28,13 +28,14 @@
     (defun on-btn-0-long-pressed () {
         (hw-sleep)
     })
-    (defun on-btn-2-pressed () {
+    (defun on-btn-2-pressed () (if (not config-units-switching-enable) nil
+    {
         (setting-units-cycle)
         (setix view-previous-stats 0 'stats-kmh) ; Re-draw units
         (setix view-previous-stats 2 'stats-temp-battery)
         (setix view-previous-stats 3 'stats-temp-esc)
         (setix view-previous-stats 4 'stats-temp-motor)
-    })
+    }))
     (defun on-btn-2-long-pressed () {
         (setting-units-cycle-temps)
         (setix view-previous-stats 2 'stats-temp-battery)
@@ -45,7 +46,7 @@
 
     (def view-previous-stats (list 'stats-kmh 'stats-battery-soc 'stats-temp-battery 'stats-temp-esc 'stats-temp-motor 'stats-angle-pitch))
 
-    (view-draw-menu "PWR" nil "UNITS" 'arrow-right)
+    (view-draw-menu "PWR" nil (if (not config-units-switching-enable) nil "UNITS") 'arrow-right)
     (view-render-menu)
     (disp-render buf-stripe-bg 5 68
         '(
@@ -105,7 +106,7 @@
         (img-clear buf-battery)
         (var displayed-soc (* 100 stats-battery-soc))
         (if (< displayed-soc 0) (setq displayed-soc 0))
-        (draw-battery-soc buf-battery 38 (second (img-dims buf-battery)) stats-battery-soc)
+        (draw-battery-vertical buf-battery 38 (second (img-dims buf-battery)) stats-battery-soc 2)
 
         (img-clear buf-battery-soc)
         (txt-block-c buf-battery-soc (list 0 1 2 3) (/ (first (img-dims buf-battery-soc)) 2) 0 font15 (str-merge (str-from-n displayed-soc "%0.0f") "%"))

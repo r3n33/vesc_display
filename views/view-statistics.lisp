@@ -7,10 +7,10 @@
     (var y-offs 0)
 
     ; Quarter guage buffer (re-used for each quadrant to save memory)
-    (def buf-gauge (img-buffer 'indexed16 buf-size buf-size))
-    (def buf-efficiency (img-buffer 'indexed4 92 55))
-    (def buf-trip (img-buffer 'indexed4 92 55))
-    (def buf-range (img-buffer 'indexed4 92 55))
+    (def buf-gauge (img-buffer dm-pool 'indexed16 buf-size buf-size))
+    (def buf-efficiency (img-buffer dm-pool 'indexed4 92 55))
+    (def buf-trip (img-buffer dm-pool 'indexed4 92 55))
+    (def buf-range (img-buffer dm-pool 'indexed4 92 55))
 
     (defun on-btn-0-pressed () (def state-view-next (previous-view)))
     (defun on-btn-2-pressed () (if (not config-units-switching-enable) nil
@@ -25,11 +25,11 @@
     (view-render-menu)
 
     ; Render gauge background
-    (var img (img-buffer 'indexed2 (* buf-size 2) 2))
+    (var img (img-buffer dm-pool 'indexed2 (* buf-size 2) 2))
     (img-line img spacing 0 (- (* buf-size 2) spacing -1) 0 1 '(thickness 2))
     (disp-render img (+ x-offs 2) (+ y-offs buf-size 2) '(0x000000 0x1b1b1b))
 
-    (var img (img-buffer 'indexed2 2 (* buf-size 2)))
+    (var img (img-buffer dm-pool 'indexed2 2 (* buf-size 2)))
     (img-line img 0 spacing 0 (- (* buf-size 2) spacing -1) 1 '(thickness 2))
     (disp-render img (+ x-offs buf-size 2) (+ y-offs 2) '(0x000000 0x1b1b1b))
 

@@ -36,18 +36,18 @@
 
 (defun view-init-bms () {
     (var view-width 320)
-    (def buf-bms-top (img-buffer 'indexed4 view-width 82))
-    (def buf-bms-center (img-buffer 'indexed4 view-width 50))
-    (def buf-bms-bottom (img-buffer 'indexed4 view-width 82))
+    (def buf-bms-top (img-buffer dm-pool 'indexed4 view-width 82))
+    (def buf-bms-center (img-buffer dm-pool 'indexed4 view-width 50))
+    (def buf-bms-bottom (img-buffer dm-pool 'indexed4 view-width 82))
 
-    (img-blit buf-bms-center (img-buffer-from-bin icon-bms-cell-high) 0 2 -1)
-    (img-blit buf-bms-center (img-buffer-from-bin icon-bms-cell-low) 0 27 -1)
+    (img-blit buf-bms-center icon-bms-cell-high 0 2 -1)
+    (img-blit buf-bms-center icon-bms-cell-low 0 27 -1)
 
-    (img-blit buf-bms-center (img-buffer-from-bin icon-bms-temp-high) 94 2 -1)
-    (img-blit buf-bms-center (img-buffer-from-bin icon-bms-temp-low) 94 27 -1)
+    (img-blit buf-bms-center icon-bms-temp-high 94 2 -1)
+    (img-blit buf-bms-center icon-bms-temp-low 94 27 -1)
 
-    (img-blit buf-bms-center (img-buffer-from-bin icon-bms-charge) 204 2 -1)
-    (img-blit buf-bms-center (img-buffer-from-bin icon-bms-chip) 204 27 -1)
+    (img-blit buf-bms-center icon-bms-charge 204 2 -1)
+    (img-blit buf-bms-center icon-bms-chip 204 27 -1)
 
     (view-init-menu)
     (defun on-btn-0-pressed () (def state-view-next (previous-view)))
@@ -149,8 +149,8 @@
         })
 
         (if (> current-ic 0.0)
-            (img-blit buf-bms-center (img-buffer-from-bin icon-bms-discharge) 204 2 -1)
-            (img-blit buf-bms-center (img-buffer-from-bin icon-bms-charge) 204 2 -1)
+            (img-blit buf-bms-center icon-bms-discharge 204 2 -1)
+            (img-blit buf-bms-center icon-bms-charge 204 2 -1)
         )
         (img-text buf-bms-center 225 2 '(0 1 2 3) font18 (padded-float (abs current-ic) "%.1fA" 5))
 

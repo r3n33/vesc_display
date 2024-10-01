@@ -1,5 +1,3 @@
-@const-symbol-strings
-
 (def init-complete nil)
 
 @const-start
@@ -78,6 +76,9 @@
 (import "lib/statistics.lisp" 'code-statistics)
 (read-eval-program code-statistics)
 
+(import "lib/draw-utils.lisp" 'code-draw-utils)
+(read-eval-program code-draw-utils)
+
 (import "views/components/view-startup.lisp" 'code-view-startup)
 (read-eval-program code-view-startup)
 
@@ -118,9 +119,6 @@
 
 (import "lib/display-utils.lisp" 'code-display-utils)
 (read-eval-program code-display-utils)
-
-(import "lib/draw-utils.lisp" 'code-draw-utils)
-(read-eval-program code-draw-utils)
 
 (import "lib/communication.lisp" 'code-communication)
 (read-eval-program code-communication)

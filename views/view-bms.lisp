@@ -70,7 +70,7 @@
 })
 
 (defun view-draw-bms () {
-    (if (> (secs-since poll-time) 1.0) {
+    (if (> (secs-since poll-time) 0.25) {
         (def poll-time (systime))
         (def view-stats-now (poll-bms-data))
     })

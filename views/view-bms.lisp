@@ -43,8 +43,8 @@
     (img-blit buf-bms-center icon-bms-cell-high 0 2 -1)
     (img-blit buf-bms-center icon-bms-cell-low 0 27 -1)
 
-    (img-blit buf-bms-center icon-bms-temp-high 94 2 -1)
-    (img-blit buf-bms-center icon-bms-temp-low 94 27 -1)
+    (img-blit buf-bms-center icon-bms-temp-high 99 2 -1)
+    (img-blit buf-bms-center icon-bms-temp-low 99 27 -1)
 
     (img-blit buf-bms-center icon-bms-charge 204 2 -1)
     (img-blit buf-bms-center icon-bms-chip 204 27 -1)
@@ -137,15 +137,15 @@
         })
 
         ; Draw second row
-        (img-text buf-bms-center 18 2 '(0 1 2 3) font18 (str-from-n (first (sort > cell-levels)) "%.1fV"))
-        (img-text buf-bms-center 18 27 '(0 1 2 3) font18 (str-from-n (first (sort < cell-levels)) "%.1fV"))
+        (img-text buf-bms-center 18 2 '(0 1 2 3) font18 (str-from-n (first (sort > cell-levels)) "%.2fV"))
+        (img-text buf-bms-center 18 27 '(0 1 2 3) font18 (str-from-n (first (sort < cell-levels)) "%.2fV"))
 
         (if (eq (car settings-units-temps) 'celsius) {
-            (img-text buf-bms-center 105 2 '(0 1 2 3) font18 (padded-float (first (sort > cell-temps)) "%.1fC" 5))
-            (img-text buf-bms-center 105 27 '(0 1 2 3) font18 (padded-float (first (sort < cell-temps)) "%.1fC" 5))
+            (img-text buf-bms-center 110 2 '(0 1 2 3) font18 (padded-float (first (sort > cell-temps)) "%.1fC" 5))
+            (img-text buf-bms-center 110 27 '(0 1 2 3) font18 (padded-float (first (sort < cell-temps)) "%.1fC" 5))
         } {
-            (img-text buf-bms-center 105 2 '(0 1 2 3) font18 (padded-float (c-to-f (first (sort > cell-temps))) "%.1fF" 5))
-            (img-text buf-bms-center 105 27 '(0 1 2 3) font18 (padded-float (c-to-f (first (sort < cell-temps))) "%.1fF" 5))
+            (img-text buf-bms-center 110 2 '(0 1 2 3) font18 (padded-float (c-to-f (first (sort > cell-temps))) "%.1fF" 5))
+            (img-text buf-bms-center 110 27 '(0 1 2 3) font18 (padded-float (c-to-f (first (sort < cell-temps))) "%.1fF" 5))
         })
 
         (if (> current-ic 0.0)

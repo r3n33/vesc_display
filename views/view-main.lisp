@@ -24,6 +24,8 @@
     (def buf-speed (img-buffer dm-pool 'indexed4 179 90))
     (def buf-units (img-buffer dm-pool 'indexed4 50 15))
 
+    (def buf-odom (img-buffer dm-pool 'indexed4 140 15))
+
     (view-init-menu)
     (defun on-btn-0-long-pressed () {
         (hw-sleep)
@@ -35,6 +37,7 @@
         (setix view-previous-stats 2 'stats-temp-battery)
         (setix view-previous-stats 3 'stats-temp-esc)
         (setix view-previous-stats 4 'stats-temp-motor)
+        (setix view-previous-stats 6 'stats-odom)
     }))
     (defun on-btn-2-long-pressed () {
         (setting-units-cycle-temps)
@@ -44,7 +47,7 @@
     })
     (defun on-btn-3-pressed () (def state-view-next (next-view)))
 
-    (def view-previous-stats (list 'stats-kmh 'stats-battery-soc 'stats-temp-battery 'stats-temp-esc 'stats-temp-motor 'stats-angle-pitch))
+    (def view-previous-stats (list 'stats-kmh 'stats-battery-soc 'stats-temp-battery 'stats-temp-esc 'stats-temp-motor 'stats-angle-pitch 'stats-odom))
 
     (view-draw-menu "PWR" nil (if (not config-units-switching-enable) nil "UNITS") 'arrow-right)
     (view-render-menu)
@@ -171,6 +174,16 @@
         (img-rectangle buf-incline (- half-width (/ txt-w 2)) (- half-height (/ font-h 2)) txt-w font-h 0 '(filled))
         (txt-block-c buf-incline (list 0 1 2 3) (/ (first (img-dims buf-incline)) 2) 13 font18 out-str)
     })
+
+    ; Draw odometer
+    (if (not-eq (to-i (* stats-odom 10)) (ix view-previous-stats 6)) {
+        (img-clear buf-odom)
+        (var odom (match (car settings-units-speeds)
+            (kmh (str-merge (str-from-n stats-odom "%0.1f") "km"))
+            (mph (str-merge (str-from-n (* stats-odom km-to-mi) "%0.1f") "mi"))
+        ))
+        (txt-block-c buf-odom (list 0 1 2 3) (/ (first (img-dims buf-odom)) 2) 0 font15 odom)
+    })
 })
 
 (defun view-render-main () {
@@ -222,7 +235,12 @@
         (disp-render buf-incline 188 4 colors-text-aa)
     })
 
-    (def view-previous-stats (list stats-kmh (to-i (* 100 stats-battery-soc)) stats-temp-battery stats-temp-esc stats-temp-motor stats-angle-pitch))
+    ; Render Odometer
+    (if (not-eq (to-i (* stats-odom 10)) (ix view-previous-stats 6))
+        (disp-render buf-odom 20 197 colors-white-icon)
+    )
+
+    (def view-previous-stats (list stats-kmh (to-i (* 100 stats-battery-soc)) stats-temp-battery stats-temp-esc stats-temp-motor stats-angle-pitch (to-i (* stats-odom 10))))
 
     (if (> (length stats-fault-codes-observed) 0) {
         (disp-render buf-warning-icon 206 46 '(0x000000 0xff0000 0x929491 0xfbfcfc))
@@ -246,4 +264,5 @@
     (def buf-battery-val nil)
     (def buf-speed nil)
     (def buf-units nil)
+    (def buf-odom nil)
 })

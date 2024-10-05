@@ -46,9 +46,9 @@
 
         ; Watt Hours / Distance
         (var whkm 0.0)
-        (if (> stats-km 0.0) (setq whkm (/ (- stats-wh stats-wh-chg) stats-km)))
+        (if (> stats-km 0.0) (setq whkm (* (/ (- stats-wh stats-wh-chg) stats-km) config-motor-count)))
         (var whmi 0.0)
-        (if (> stats-km 0.0) (setq whmi (/ (- stats-wh stats-wh-chg) (* stats-km km-to-mi))))
+        (if (> stats-km 0.0) (setq whmi (* (/ (- stats-wh stats-wh-chg) (* stats-km km-to-mi)) config-motor-count)))
 
         ; Efficiency
         (match (car settings-units-speeds)

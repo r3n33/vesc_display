@@ -18,10 +18,17 @@
 
     (var bms-temp-count (get-bms-val 'bms-temp-adc-num))
     (var bms-cell-temps (range 0 bms-temp-count))
+    (var bms-temp-count-filtered 0)
     (looprange i 0 bms-temp-count {
         (var temp-sensor (get-bms-val 'bms-temps-adc i))
-        (setix bms-cell-temps i temp-sensor)
+        ; Filter out 0.0 and <= -50.0C values
+        (if (and (!= temp-sensor 0.0) (> temp-sensor -50.0)) {
+            (setix bms-cell-temps bms-temp-count-filtered temp-sensor)
+            (setq bms-temp-count-filtered (+ bms-temp-count-filtered 1))
+        })
     })
+    (setq bms-temp-count bms-temp-count-filtered)
+    (setq bms-cell-temps (take bms-cell-temps bms-temp-count))
 
     (list bms-cell-count bms-cell-levels bms-bal-states bms-cell-temps bms-current-ic bms-temp-ic)
 })
@@ -36,18 +43,18 @@
 
 (defun view-init-bms () {
     (var view-width 320)
-    (def buf-bms-top (img-buffer 'indexed4 view-width 82))
-    (def buf-bms-center (img-buffer 'indexed4 view-width 50))
-    (def buf-bms-bottom (img-buffer 'indexed4 view-width 82))
+    (def buf-bms-top (img-buffer dm-pool 'indexed4 view-width 82))
+    (def buf-bms-center (img-buffer dm-pool 'indexed4 view-width 50))
+    (def buf-bms-bottom (img-buffer dm-pool 'indexed4 view-width 82))
 
-    (img-blit buf-bms-center (img-buffer-from-bin icon-bms-cell-high) 0 2 -1)
-    (img-blit buf-bms-center (img-buffer-from-bin icon-bms-cell-low) 0 27 -1)
+    (img-blit buf-bms-center icon-bms-cell-high 0 2 -1)
+    (img-blit buf-bms-center icon-bms-cell-low 0 27 -1)
 
-    (img-blit buf-bms-center (img-buffer-from-bin icon-bms-temp-high) 94 2 -1)
-    (img-blit buf-bms-center (img-buffer-from-bin icon-bms-temp-low) 94 27 -1)
+    (img-blit buf-bms-center icon-bms-temp-high 99 2 -1)
+    (img-blit buf-bms-center icon-bms-temp-low 99 27 -1)
 
-    (img-blit buf-bms-center (img-buffer-from-bin icon-bms-charge) 204 2 -1)
-    (img-blit buf-bms-center (img-buffer-from-bin icon-bms-chip) 204 27 -1)
+    (img-blit buf-bms-center icon-bms-charge 204 2 -1)
+    (img-blit buf-bms-center icon-bms-chip 204 27 -1)
 
     (view-init-menu)
     (defun on-btn-0-pressed () (def state-view-next (previous-view)))
@@ -63,7 +70,7 @@
 })
 
 (defun view-draw-bms () {
-    (if (> (secs-since poll-time) 1.0) {
+    (if (> (secs-since poll-time) 0.25) {
         (def poll-time (systime))
         (def view-stats-now (poll-bms-data))
     })
@@ -137,20 +144,20 @@
         })
 
         ; Draw second row
-        (img-text buf-bms-center 18 2 '(0 1 2 3) font18 (str-from-n (first (sort > cell-levels)) "%.1fV"))
-        (img-text buf-bms-center 18 27 '(0 1 2 3) font18 (str-from-n (first (sort < cell-levels)) "%.1fV"))
+        (img-text buf-bms-center 18 2 '(0 1 2 3) font18 (str-from-n (first (sort > cell-levels)) "%.2fV"))
+        (img-text buf-bms-center 18 27 '(0 1 2 3) font18 (str-from-n (first (sort < cell-levels)) "%.2fV"))
 
         (if (eq (car settings-units-temps) 'celsius) {
-            (img-text buf-bms-center 105 2 '(0 1 2 3) font18 (padded-float (first (sort > cell-temps)) "%.1fC" 5))
-            (img-text buf-bms-center 105 27 '(0 1 2 3) font18 (padded-float (first (sort < cell-temps)) "%.1fC" 5))
+            (img-text buf-bms-center 110 2 '(0 1 2 3) font18 (padded-float (first (sort > cell-temps)) "%.1fC" 5))
+            (img-text buf-bms-center 110 27 '(0 1 2 3) font18 (padded-float (first (sort < cell-temps)) "%.1fC" 5))
         } {
-            (img-text buf-bms-center 105 2 '(0 1 2 3) font18 (padded-float (c-to-f (first (sort > cell-temps))) "%.1fF" 5))
-            (img-text buf-bms-center 105 27 '(0 1 2 3) font18 (padded-float (c-to-f (first (sort < cell-temps))) "%.1fF" 5))
+            (img-text buf-bms-center 110 2 '(0 1 2 3) font18 (padded-float (c-to-f (first (sort > cell-temps))) "%.1fF" 5))
+            (img-text buf-bms-center 110 27 '(0 1 2 3) font18 (padded-float (c-to-f (first (sort < cell-temps))) "%.1fF" 5))
         })
 
         (if (> current-ic 0.0)
-            (img-blit buf-bms-center (img-buffer-from-bin icon-bms-discharge) 204 2 -1)
-            (img-blit buf-bms-center (img-buffer-from-bin icon-bms-charge) 204 2 -1)
+            (img-blit buf-bms-center icon-bms-discharge 204 2 -1)
+            (img-blit buf-bms-center icon-bms-charge 204 2 -1)
         )
         (img-text buf-bms-center 225 2 '(0 1 2 3) font18 (padded-float (abs current-ic) "%.1fA" 5))
 

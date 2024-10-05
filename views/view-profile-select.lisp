@@ -12,7 +12,7 @@
     (if (not (esc-request `(conf-set 'l-current-min-scale ,val-brake))) (setq apply-success nil))
     (if (not (esc-request `(conf-set 'l-current-max-scale ,val-accel))) (setq apply-success nil))
 
-    (var buf-result (img-buffer 'indexed4 100 25))
+    (var buf-result (img-buffer dm-pool 'indexed4 100 25))
     (txt-block-l buf-result
         '(0 1 2 3)
         0
@@ -27,10 +27,10 @@
     (def profile-active (read-setting 'pf-active))
     (apply-profile-params (+ profile-active 1))
 
-    (def buf-profile-speed (img-buffer 'indexed4 81 179))
-    (def buf-profile-brake (img-buffer 'indexed4 81 179))
-    (def buf-profile-accel (img-buffer 'indexed4 81 179))
-    (def buf-title (img-buffer 'indexed4 150 25))
+    (def buf-profile-speed (img-buffer dm-pool 'indexed4 81 179))
+    (def buf-profile-brake (img-buffer dm-pool 'indexed4 81 179))
+    (def buf-profile-accel (img-buffer dm-pool 'indexed4 81 179))
+    (def buf-title (img-buffer dm-pool 'indexed4 150 25))
 
     (def profile-previous nil) ; Track last selection
 

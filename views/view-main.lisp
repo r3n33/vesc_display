@@ -1,28 +1,28 @@
 @const-start
 
 (defun view-init-main  () {
-    (def buf-stripe-bg (img-buffer-from-bin icon-stripe))
-    (def buf-stripe-fg (img-buffer 'indexed16 141 19))
-    (def buf-stripe-top (img-buffer-from-bin icon-stripe-top))
-    (def buf-arrow-l (img-buffer-from-bin icon-arrow-l))
-    (def buf-arrow-r (img-buffer-from-bin icon-arrow-r))
+    (def buf-stripe-bg icon-stripe)
+    (def buf-stripe-fg (img-buffer dm-pool 'indexed16 141 19))
+    (def buf-stripe-top icon-stripe-top)
+    (def buf-arrow-l icon-arrow-l)
+    (def buf-arrow-r icon-arrow-r)
     (img-blit buf-stripe-fg buf-stripe-top 0 0 -1)
 
-    (def buf-motor-icon (img-buffer-from-bin icon-motor))
-    (def buf-esc-icon (img-buffer-from-bin icon-esc))
-    (def buf-battery-icon (img-buffer-from-bin icon-battery))
-    (def buf-warning-icon (img-buffer-from-bin icon-warning))
+    (def buf-motor-icon icon-motor)
+    (def buf-esc-icon icon-esc)
+    (def buf-battery-icon icon-battery)
+    (def buf-warning-icon icon-warning)
 
-    (def buf-motor-val (img-buffer 'indexed4 59 20))
-    (def buf-esc-val (img-buffer 'indexed4 59 20))
-    (def buf-battery-val (img-buffer 'indexed4 59 20))
+    (def buf-motor-val (img-buffer dm-pool 'indexed4 59 20))
+    (def buf-esc-val (img-buffer dm-pool 'indexed4 59 20))
+    (def buf-battery-val (img-buffer dm-pool 'indexed4 59 20))
 
-    (def buf-incline (img-buffer 'indexed4 120 35))
-    (def buf-battery (img-buffer 'indexed4 42 120))
-    (def buf-battery-soc (img-buffer 'indexed4 50 20))
+    (def buf-incline (img-buffer dm-pool 'indexed4 120 35))
+    (def buf-battery (img-buffer dm-pool 'indexed4 42 120))
+    (def buf-battery-soc (img-buffer dm-pool 'indexed4 50 20))
     
-    (def buf-speed (img-buffer 'indexed4 179 90))
-    (def buf-units (img-buffer 'indexed4 50 15))
+    (def buf-speed (img-buffer dm-pool 'indexed4 179 90))
+    (def buf-units (img-buffer dm-pool 'indexed4 50 15))
 
     (view-init-menu)
     (defun on-btn-0-long-pressed () {

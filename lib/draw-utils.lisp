@@ -1,4 +1,7 @@
+(def dm-pool (dm-create 25600))
+
 @const-start
+
 (def pi 3.141592)
 
 (defun ease-in-out-quint (x)
@@ -89,7 +92,7 @@
 })
 
 (defun txt-block-v (img col tc x y w h font txt) {
-    (var buf-temp (img-buffer 'indexed4 h w)) ; Create rotated buffer for img-blit
+    (var buf-temp (img-buffer dm-pool 'indexed4 h w)) ; Create rotated buffer for img-blit
     (img-clear buf-temp (first col))
 
     (txt-block-c buf-temp col (/ h 2) 0 font txt)

@@ -1,7 +1,7 @@
 @const-start
 
 (defun wait-for-esc () {
-    (var spin-buf (img-buffer 'indexed2 65 64))
+    (var spin-buf (img-buffer dm-pool 'indexed2 65 64))
     (var angle-previous 0.0)
     (var spin-time 6.0)
     (var start-time (systime))
@@ -25,7 +25,7 @@
 })
 
 (defun start-boot-animation () {
-    (var logo (img-buffer-from-bin icon-logo))
+    (var logo icon-logo)
     (var logo-w (first (img-dims logo)))
     (var logo-h (second (img-dims logo)))
 

@@ -18,10 +18,17 @@
 
     (var bms-temp-count (get-bms-val 'bms-temp-adc-num))
     (var bms-cell-temps (range 0 bms-temp-count))
+    (var bms-temp-count-filtered 0)
     (looprange i 0 bms-temp-count {
         (var temp-sensor (get-bms-val 'bms-temps-adc i))
-        (setix bms-cell-temps i temp-sensor)
+        ; Filter out 0.0 and <= -50.0C values
+        (if (and (!= temp-sensor 0.0) (> temp-sensor -50.0)) {
+            (setix bms-cell-temps bms-temp-count-filtered temp-sensor)
+            (setq bms-temp-count-filtered (+ bms-temp-count-filtered 1))
+        })
     })
+    (setq bms-temp-count bms-temp-count-filtered)
+    (setq bms-cell-temps (take bms-cell-temps bms-temp-count))
 
     (list bms-cell-count bms-cell-levels bms-bal-states bms-cell-temps bms-current-ic bms-temp-ic)
 })

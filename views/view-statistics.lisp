@@ -13,14 +13,15 @@
     (def buf-range (img-buffer 'indexed4 92 55))
 
     (defun on-btn-0-pressed () (def state-view-next (previous-view)))
-    (defun on-btn-2-pressed () {
+    (defun on-btn-2-pressed () (if (not config-units-switching-enable) nil
+    {
         (setting-units-cycle)
         (setix view-previous-stats 3 'stats-km) ; Re-draw units
-    })
+    }))
     (defun on-btn-3-pressed () (def state-view-next (next-view)))
 
     ; Render menu
-    (view-draw-menu 'arrow-left nil "UNITS" 'arrow-right)
+    (view-draw-menu 'arrow-left nil (if (not config-units-switching-enable) nil "UNITS") 'arrow-right)
     (view-render-menu)
 
     ; Render gauge background

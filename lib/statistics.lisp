@@ -21,6 +21,7 @@
 (def stats-battery-ah 0)
 ; ID24
 (def stats-vin 0)
+(def stats-odom 0.0)
 
 ; Computed Statistics (resettable)
 (def stats-reset-now nil)

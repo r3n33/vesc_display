@@ -12,4 +12,4 @@
 (def config-profiles-enable true) ; Enable profile selection and editing
 (def config-homologation-enable false) ; Enable homologation view
 
-(def config-motor-count 1) ; Set the number of ESCs/Motors for proper range estimation
+(def config-motor-count 1) ; Set the number of ESCs/Motors for range estimation and consumption calculation

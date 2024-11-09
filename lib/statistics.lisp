@@ -104,11 +104,15 @@
     })
 })
 
-(spawn (fn () (loopwhile t {
-    (spawn-trap stats-thread)
-    (recv   ((exit-error (? tid) (? e))
-                (print (str-merge "stats-thread error: " (to-str e)))
-            )
-            ((exit-ok (? tid) (? v)) 'ok))
-    (sleep 1.0)
-})))
+(if config-error-recovery
+    (spawn (fn () (loopwhile t {
+        (print "Starting stats-thread")
+        (spawn-trap stats-thread)
+        (recv   ((exit-error (? tid) (? e))
+                    (print (str-merge "stats-thread error: " (to-str e)))
+                )
+                ((exit-ok (? tid) (? v)) 'ok))
+        (sleep 1.0)
+    })))
+    (spawn stats-thread)
+)

@@ -11,3 +11,5 @@
 (def config-units-switching-enable true) ; Enable UNITS menu option and button
 (def config-profiles-enable true) ; Enable profile selection and editing
 (def config-homologation-enable false) ; Enable homologation view
+
+(def config-error-recovery true) ; Automatically restart threads on error

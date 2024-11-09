@@ -152,12 +152,15 @@
     })
 })
 
-;(spawn display-thread)
-(spawn (fn () (loopwhile t {
-    (spawn-trap display-thread)
-    (recv   ((exit-error (? tid) (? e))
-                (print (str-merge "display-thread error: " (to-str e)))
-            )
-            ((exit-ok (? tid) (? v)) 'ok))
-    (sleep 1.0)
-})))
+(if config-error-recovery
+    (spawn (fn () (loopwhile t {
+        (print "Starting display-thread")
+        (spawn-trap display-thread)
+        (recv   ((exit-error (? tid) (? e))
+                    (print (str-merge "display-thread error: " (to-str e)))
+                )
+                ((exit-ok (? tid) (? v)) 'ok))
+        (sleep 1.0)
+    })))
+    (spawn display-thread)
+)

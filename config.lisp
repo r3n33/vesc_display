@@ -1,6 +1,6 @@
 @const-start
 
-(def config-can-id-esc 10)
+(def config-can-id-esc (list 10)) ; A list of one or many ESC can-ids
 
 (def config-metric-speeds true)
 (def config-metric-temps true)
@@ -11,5 +11,3 @@
 (def config-units-switching-enable true) ; Enable UNITS menu option and button
 (def config-profiles-enable true) ; Enable profile selection and editing
 (def config-homologation-enable false) ; Enable homologation view
-
-(def config-motor-count 1) ; Set the number of ESCs/Motors for range estimation and consumption calculation

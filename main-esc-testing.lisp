@@ -67,8 +67,8 @@
                 (bufset-u16 buf-canid23 6 (to-i (conf-get 'si-battery-ah)))
 
                 (bufset-u16 buf-canid24 0 (* (get-vin) 10))
-                (bufset-u16 buf-canid24 2 (* (/ (sysinfo 'odometer) 1000.0) 10))
-                (bufset-u16 buf-canid24 4 (* (abs (get-speed-set)) 3.6 10))
+                (bufset-u32 buf-canid24 2 (* (/ (sysinfo 'odometer) 1000.0) 10))
+                (bufset-u16 buf-canid24 6 (* (abs (get-speed-set)) 3.6 10))
 
                 (sleep 0.1) ; 10 Hz
 ))))

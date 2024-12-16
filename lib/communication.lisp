@@ -71,8 +71,8 @@
         })
         ((= id 24) {
             (def stats-vin (/ (bufget-u16 data 0) 10.0))
-            (def stats-odom (/ (bufget-u16 data 2) 10.0))
-            (def cruise-control-speed (/ (bufget-u16 data 4) 10.0))
+            (def stats-odom (/ (bufget-u32 data 2) 10.0))
+            (def cruise-control-speed (/ (bufget-u16 data 6) 10.0))
             (setq rx-cnt-can (+ rx-cnt-can 1))
         })
         ((= id 30) {
